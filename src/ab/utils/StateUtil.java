@@ -1,11 +1,13 @@
 /*****************************************************************************
-** ANGRYBIRDS AI AGENT FRAMEWORK
-** Copyright (c) 2014,XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
-**  Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
-** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
-*****************************************************************************/
+ ** ANGRYBIRDS AI AGENT FRAMEWORK
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
+ ** All rights reserved.
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+ *****************************************************************************/
 
 package ab.utils;
 
@@ -20,7 +22,7 @@ import ab.server.proxy.message.ProxyScreenshotMessage;
 import ab.vision.GameStateExtractor;
 import ab.vision.GameStateExtractor.GameState;
 
-
+import ab.server.proxy.message.ProxyClickMessage;
 public class StateUtil {
     /**
      * Get the current game state
@@ -30,14 +32,32 @@ public class StateUtil {
 	{
 		 byte[] imageBytes = proxy.send(new ProxyScreenshotMessage());
 		
-	        BufferedImage image = null;
-	        try {
-	            image = ImageIO.read(new ByteArrayInputStream(imageBytes));
-	        } catch (IOException e) {
-	          
-	        }
-	        GameStateExtractor gameStateExtractor = new GameStateExtractor();
-	        GameStateExtractor.GameState state = gameStateExtractor.getGameState(image);
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(new ByteArrayInputStream(imageBytes));
+		} catch (IOException e) {
+			System.out.println("getGameState IO read");
+		}
+		GameStateExtractor gameStateExtractor = new GameStateExtractor();
+		GameStateExtractor.GameState state = gameStateExtractor.getGameState(image);
+       	if (state == GameState.CONTINUE)
+		{
+		    proxy.send(new ProxyClickMessage(17,17));	
+		}
+	    if (state == GameState.EAGLE)
+		{
+		    proxy.send(new ProxyClickMessage(170,350));	
+		    	  try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+		    proxy.send(new ProxyClickMessage(100,31));	
+		}
+	   if (state == GameState.TUTORIAL)
+		{
+		    proxy.send(new ProxyClickMessage(500,320));	
+		}
 		  return state;
 	}
 
@@ -59,9 +79,9 @@ public class StateUtil {
         if (state == GameState.PLAYING)
         	score = gameStateExtractor.getScoreInGame(image);
         else
-        	if(state == GameState.WON)
+        	if (state == GameState.WON)
         		score = gameStateExtractor.getScoreEndGame(image);
-       if(score == -1)
+       if (score == -1)
     	   System.out.println(" Game score is unavailable "); 	   
 		return score;
 	}
@@ -83,12 +103,15 @@ public class StateUtil {
 			
 				e.printStackTrace();
 			}
-		   if(getGameState(proxy) == GameState.WON)
+		   if (getGameState(proxy) == GameState.WON)
 		   {	
 			   current_score = _getScore(proxy);
 		   }
 		   else
-			   System.out.println(" Unexpected state: PLAYING");
+		   {
+			    current_score = _getScore(proxy);
+			   //System.out.println(" Unexpected state: PLAYING");
+			}
 		}
 		return current_score;
 	}

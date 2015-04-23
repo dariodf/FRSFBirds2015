@@ -1,10 +1,12 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014, XiaoYu (Gary) Ge, Stephen Gould, Jochen Renz
- **  Sahan Abeyasinghe,Jim Keys,  Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
 package ab.vision.real;
 
@@ -350,14 +352,17 @@ public class ImageSegmenter {
     {        
         // find edges and add to the class map        
         _edges = findEdges();
+
         for (int y = _groundLevel-1; y > 0; y--)
-        for (int x = 0; x < _width; x++)
         {
-            if (!(_class[y][x] >= ICE && _class[y][x] <= STONE))
-                continue;
-            
-            if (_edges[y][x])
-                _class[y][x] = EDGE;
+            for (int x = 0; x < _width; x++)
+            {
+                if (!(_class[y][x] >= ICE && _class[y][x] <= STONE))
+                    continue;
+                
+                if (_edges[y][x])
+                    _class[y][x] = EDGE;
+            }
         }
         
         // search for connected components
@@ -365,24 +370,27 @@ public class ImageSegmenter {
         boolean searched[][] = new boolean[_height][_width];
         
         for (int x = 50; x < _width - 50; x++)
-        for (int y = _groundLevel - 1; y > _height * 0.2; y--)
         {
-            int cls = _class[y][x];
-            if (!searched[y][x] && cls > GROUND && cls < EDGE)
+            for (int y = _groundLevel - 2; y > _height * 0.2; y--)
             {
-                ConnectedComponent cc;
-                
-                // use 8-connect for birds and sling, 4-connect otherwise
-                if (cls >= SLING && cls <= BLACK_BIRD)
-                    cc = new ConnectedComponent(_class, x, y, searched, true);
-                else
-                    cc = new ConnectedComponent(_class, x, y, searched, false);
-                
-                // verify component has the correct size
-                if (cc.getArea() >= MIN_SIZE[cls] && cc.getArea() <= MAX_SIZE[cls])
-                    _components.add(cc);
-            }  
+                int cls = _class[y][x];
+                if (!searched[y][x] && cls > GROUND && cls < EDGE)
+                {
+                    ConnectedComponent cc;
+                    
+                    // use 8-connect for birds and sling, 4-connect otherwise
+                    if (cls >= SLING && cls <= BLACK_BIRD)
+                        cc = new ConnectedComponent(_class, x, y, searched, true);
+                    else
+                        cc = new ConnectedComponent(_class, x, y, searched, false);
+                    
+                    // verify component has the correct size
+                    if (cc.getArea() >= MIN_SIZE[cls] && cc.getArea() <= MAX_SIZE[cls])
+                        _components.add(cc);
+                }  
+            }
         }
+
         //_edges = null;
         return _components;
     }
@@ -423,7 +431,7 @@ public class ImageSegmenter {
                 if (_class[y][x] == GROUND)
                     counter++;
             }
-            if (counter < _width * 0.8)
+            if (counter < _width * 0.6)
             {
                 _groundLevel = y;
                 break;

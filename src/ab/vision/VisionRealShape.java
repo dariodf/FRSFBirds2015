@@ -1,10 +1,12 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014, XiaoYu (Gary) Ge, Stephen Gould, Jochen Renz
- **  Sahan Abeyasinghe,Jim Keys,  Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
  
 package ab.vision;
@@ -19,11 +21,20 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import ab.demo.other.ActionRobot;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import ab.demo.other.ClientActionRobot;
+import ab.demo.other.ClientActionRobotJava;
+
 import ab.vision.real.ConnectedComponent;
 import ab.vision.real.ImageSegmenter;
 import ab.vision.real.shape.Body;
 import ab.vision.real.shape.Circle;
+
+import dl.utils.*;
 
 public class VisionRealShape 
 {
@@ -40,7 +51,7 @@ public class VisionRealShape
     // detected game objects
     private Rectangle _sling = null;
     private List<ABObject> _birds = null;
-
+    private List<ABObject> _pigs = null;
     
     // connected component and shapes for drawing purposes
     private ArrayList<ConnectedComponent> _draw = null;
@@ -55,6 +66,8 @@ public class VisionRealShape
     
     // ground level
     private int _ground = 0;
+
+    private static int _nOfScreens = 0;
     
     public VisionRealShape(BufferedImage screenshot)
     {
@@ -75,7 +88,7 @@ public class VisionRealShape
         _drawShape = new ArrayList<Body>();
      
         // find the slingshot and reference point
-        findSling();
+        findSling();        
       
     }
     
@@ -84,20 +97,23 @@ public class VisionRealShape
     {
         if (_sling != null) return _sling;
         
-        // use the highest sling typed component: e.g. frame
+        // use the highest sling typed component with 
         int minY = 999999;
         ConnectedComponent sling = null;
+
         for (ConnectedComponent c : _components)
         {
             int top = c.boundingBox()[1];
-            int left = c.boundingBox()[0];
             if (c.getType() == ImageSegmenter.SLING 
-                && top < minY && left < 300)
-            {
+                && top < minY
+                // case when found tnt
+                && (double)c.getWidth()/(double)c.getHeight() < 0.75)
+            {                
                 minY = top;
                 sling = c;
             }
         }
+
         if (sling == null)
             return null;
             
@@ -118,7 +134,8 @@ public class VisionRealShape
     public List<ABObject> findBirds()
     {
         if (_birds != null) return _birds;
-        if (_sling == null) return null;
+        if (_sling == null) findSling();
+        if (_pigs == null) findPigs();
         
         _birds = new LinkedList<ABObject>();
         
@@ -127,16 +144,35 @@ public class VisionRealShape
         final int BIRD_DISTANCE = 150;
         for (ConnectedComponent c : _components)
         {
-            if (c.getType() > ImageSegmenter.SLING && c.getType() < ImageSegmenter.PIG)
+            if (c.getType() > ImageSegmenter.SLING 
+                && c.getType() < ImageSegmenter.PIG)
             {
+                /* the bounding box {left, top, right, bottom} */
                 int bound[] = c.boundingBox();
+                boolean isPartOfThePig = false;
                 
                 // exit if next component is far from the last bird detected
-                if (bound[2] > _width / 2 || (xMax != -2 && bound[0] - xMax > BIRD_DISTANCE))
+                if (bound[2] > _width / 2 
+                    || (xMax != -2 && bound[0] - xMax > BIRD_DISTANCE))
                     break;
+
+                for (ABObject pig : _pigs)
+                {
+                    if (pig.x - 2 < bound[2]
+                        && bound[0] < pig.x + pig.width + 2
+                        && pig.y - 2 < bound[1]
+                        && bound[3] < pig.y + pig.height + 2)
+                        {
+                            isPartOfThePig = true;
+                            break;
+                        }
+                }            
                 
-                // add if not overlapping with previous bird
-                if ((bound[0] + bound[2]) / 2 > xMax + 1)
+                // add if not overlapping with previous bird and 
+                if (//bound[0] > xMax
+                    (bound[0] + bound[2]) / 2 > xMax
+                    && !isPartOfThePig)
+                    //&& bound[3] < _ground + 2)
                 {
                     Circle b = (Circle) c.getBody();
                     _birds.add(b);
@@ -146,22 +182,19 @@ public class VisionRealShape
                 }
             }
         }
-        //System.out.println(_birds.size() + " birds found");
         return _birds;
     }
     
     public List<ABObject> findPigs()
     {
-    	  int xMin = 0;
-          if (_sling != null)
-              xMin = _sling.x + 100;
+
           List<ABObject> pigs = new LinkedList<ABObject>();
           for (ConnectedComponent c : _components)
           {
               if (c.getType() == ImageSegmenter.PIG)
               {
                   Body b = c.getBody();
-                  if (b == null || ( b.centerX < xMin))
+                  if (b == null)// || ( b.centerX < xMin))
                       continue;
                   pigs.add(b);
                   _draw.add(c);
@@ -169,20 +202,24 @@ public class VisionRealShape
               }
               
           }
-          return pigs;
+
+        //  if (pigs.size() > 0)
+        _pigs = pigs;
+
+        return pigs;
     }
     public List<ABObject> findHills()
     {
-    	  int xMin = 0;
-          if (_sling != null)
-              xMin = _sling.x + 100;
+    	  // int xMin = 0;
+       //    if (_sling != null)
+       //        xMin = _sling.x + 100;
           List<ABObject> hills = new LinkedList<ABObject>();
           for (ConnectedComponent c : _components)
           {
               if (c.getType() == ImageSegmenter.HILLS)
               {
                   Body b = c.getBody();
-                  if (b == null || ( b.centerX < xMin))
+                  if (b == null)// || ( b.centerX < xMin))
                       continue;
                   hills.add(b);
                   _draw.add(c);
@@ -195,9 +232,9 @@ public class VisionRealShape
     // find all objects in the scene beside slingshot, birds, pigs. and hills.
     public List<ABObject> findObjects()
     {
-        int xMin = 0;
-        if (_sling != null)
-            xMin = _sling.x + 100;
+        // int xMin = 0;
+        // if (_sling != null)
+        //     xMin = _sling.x + 100;
             
         List<ABObject> blocks = new LinkedList<ABObject>();
         for (ConnectedComponent c : _components)
@@ -205,8 +242,10 @@ public class VisionRealShape
             if ((c.getType() > ImageSegmenter.PIG && c.getType() <= ImageSegmenter.DUCK))
             {
                 Body b = c.getBody();
-                if (b == null || ( b.centerX < xMin))
+
+                if (b == null)// || ( b.centerX < xMin))
                     continue;
+
                 blocks.add(b);
                 _draw.add(c);
                 _drawShape.add(b);
@@ -308,12 +347,12 @@ public class VisionRealShape
                 d.draw(image, false, false);
         }
        // for (Body b : _drawShape)
-        for(Body b : _drawShape)
+        for (Body b : _drawShape)
         if (b != null)
         	{	
         		b.draw(g, false, Color.RED);
         		g.setColor(Color.black);
-        		if(b.id != unassigned)
+        		if (b.id != unassigned)
         			g.drawString(b.id + "", (int)b.centerX - 5, (int)b.centerY + 5);// 10: font size
         	}
             
@@ -340,16 +379,19 @@ public class VisionRealShape
     }
 
 
-	public static void main(String args[])
+	// public static void main(String args[])
+	// {
+	// 	new ActionRobot();
+	// 	BufferedImage screenshot = ActionRobot.doScreenShot();
+	// 	Vision vision = new Vision(screenshot);
+	// 	//List<ABObject> objs = vision.findBlocksRealShape();
+	// 	List<ABObject> objs = vision.findHills();
+	// 	for (ABObject obj : objs)
+	// 		System.out.println(obj);
+	// }
+	
+	public int getGroundLevel()
 	{
-		new ActionRobot();
-		BufferedImage screenshot = ActionRobot.doScreenShot();
-		Vision vision = new Vision(screenshot);
-		//List<ABObject> objs = vision.findBlocksRealShape();
-		//List<ABObject> objs = vision.findHills();
-		Rectangle obj = vision.findSlingshotMBR();
-		System.out.println(obj);
-//		for (ABObject obj : objs)
-//			System.out.println(obj);
+		return _ground;	
 	}
 }

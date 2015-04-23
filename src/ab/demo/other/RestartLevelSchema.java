@@ -1,11 +1,13 @@
 /*****************************************************************************
-** ANGRYBIRDS AI AGENT FRAMEWORK
-** Copyright (c) 2014,XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
-**  Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
-** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
-*****************************************************************************/
+ ** ANGRYBIRDS AI AGENT FRAMEWORK
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
+ ** All rights reserved.
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+ *****************************************************************************/
 package ab.demo.other;
 
 import ab.server.Proxy;
@@ -26,7 +28,7 @@ public boolean restartLevel()
 {
 	GameState state = StateUtil.getGameState(proxy);
 	
-	if(state == GameState.WON || state == GameState.LOST)
+	if (state == GameState.WON || state == GameState.LOST)
 	{
 		proxy.send( new ProxyClickMessage(420,380));//Click the left most button at the end page
 		System.out.println(" restart the level ");
@@ -36,7 +38,7 @@ public boolean restartLevel()
 				e1.printStackTrace();
 			}
 	}
-	else if(state == GameState.PLAYING)
+	else if (state == GameState.PLAYING)
 		{
 			proxy.send(new ProxyClickMessage(100,39));
 			  try {

@@ -1,24 +1,33 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014, XiaoYu (Gary) Ge, Stephen Gould, Jochen Renz
- **  Sahan Abeyasinghe,Jim Keys,  Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
 
 package ab.demo.other;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.Point;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import ab.vision.ABType;
 import ab.vision.ABObject;
 import ab.vision.ABType;
 import ab.vision.Vision;
 import ab.vision.GameStateExtractor.GameState;
+import ab.vision.GameStateExtractor;
+
+import ab.planner.TrajectoryPlanner;
+
 import external.ClientMessageEncoder;
 
 //Java interface of ClientActionRobot
@@ -47,10 +56,10 @@ public class ClientActionRobotJava extends ClientActionRobot {
 	
 	//send a shot message using int values as input
 	public byte[] shoot(int fx, int fy, int dx, int dy, int t1, int t2,
-			boolean polar) {
-		return super.shoot(intToByteArray(fx), intToByteArray(fy),
+			boolean polar, TrajectoryPlanner tp, Rectangle sling, ABType birdOnSling, List<ABObject> blocks, List<ABObject> birds, int nOfShots) {
+		return super.shootFast(intToByteArray(fx), intToByteArray(fy),
 				intToByteArray(dx), intToByteArray(dy), intToByteArray(t1),
-				intToByteArray(t2), polar);
+				intToByteArray(t2), polar, tp, sling, birdOnSling, blocks, birds, nOfShots);
 	}
 
 	//send a shot sequence message using int arrays as input
@@ -80,7 +89,7 @@ public class ClientActionRobotJava extends ClientActionRobot {
 		}
 		fullyZoomOut();
 		List<ABObject> _birds = vision.findBirdsMBR();
-		if(_birds.isEmpty())
+		if (_birds.isEmpty())
 			return ABType.Unknown;
 		Collections.sort(_birds, new Comparator<Rectangle>(){
 
@@ -99,5 +108,23 @@ public class ClientActionRobotJava extends ClientActionRobot {
 			_scores[i] = super.bytesToInt(scores[i * 4], scores[i*4 + 1], scores[i*4 + 2], scores[i*4 + 3]);
 		}
 		return _scores;
+	}
+
+	public int getCurrentScore() {
+		BufferedImage img = doScreenShot();
+
+		int score = -1;
+
+        GameStateExtractor gameStateExtractor = new GameStateExtractor();
+        GameState state = gameStateExtractor.getGameState(img);
+
+        if (state == GameState.PLAYING)
+        	score = gameStateExtractor.getScoreInGame(img);
+        else if (state == GameState.WON)
+        		score = gameStateExtractor.getScoreEndGame(img);
+
+       	// if (score == -1)
+    	   // System.out.println(" Game score is unavailable "); 	   
+		return score;
 	}
 }

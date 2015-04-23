@@ -1,22 +1,32 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014,XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
- **  Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
 package ab.demo.other;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
+import java.awt.Color;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+
 import java.net.UnknownHostException;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+
+import java.lang.Math;
 
 import javax.imageio.ImageIO;
 
@@ -25,12 +35,19 @@ import ab.server.proxy.message.ProxyClickMessage;
 import ab.server.proxy.message.ProxyDragMessage;
 import ab.server.proxy.message.ProxyMouseWheelMessage;
 import ab.server.proxy.message.ProxyScreenshotMessage;
+
 import ab.utils.StateUtil;
+
 import ab.vision.ABObject;
 import ab.vision.ABType;
 import ab.vision.GameStateExtractor.GameState;
 import ab.vision.Vision;
+import ab.vision.VisionUtils;
+import ab.vision.real.shape.*;
 
+import ab.planner.TrajectoryPlanner;
+
+import dl.utils.*;
 /**
  * Util class for basic functions
  * 
@@ -39,7 +56,7 @@ public class ActionRobot {
 	public static Proxy proxy;
 	public String level_status = "UNKNOWN";
 	public int current_score = 0;
-	private LoadLevelSchema lls;
+	private LoadingLevelSchema lls;
 	private RestartLevelSchema rls;
 	static {
 		if (proxy == null) {
@@ -73,7 +90,7 @@ public class ActionRobot {
 	// A java util class for the standalone version. It provides common
 	// functions an agent would use. E.g. get the screenshot
 	public ActionRobot() {
-		lls = new LoadLevelSchema(proxy);
+		lls = new LoadingLevelSchema(proxy);
 		rls = new RestartLevelSchema(proxy);
 	}
 
@@ -140,19 +157,85 @@ public class ActionRobot {
 		}
 
 	}
+	/*Checks and waits until no objects are moving in the screenshot*/
+	public void waitingForSceneToBeSteady(List<ABObject> birdsOld)
+	{
+		int last = -1;
+		while (getState() == GameState.PLAYING)
+		{
+			BufferedImage screen = doScreenShot();
 
-	public void cshoot(Shot shot) {
+			// erase birds
+			Graphics2D g2d = screen.createGraphics();
+
+			for (ABObject bird : birdsOld)
+			{
+				g2d.setColor(new Color(148,206,222));				
+				g2d.fillRect(bird.getCenter().x-40, bird.getCenter().y-40, 80, 80);
+
+				g2d.setColor(Color.magenta);				
+				g2d.drawString(bird.type.toString(),bird.getCenter().x,bird.getCenter().y);
+			}
+
+			Vision vision = new Vision(screen);
+			int total = 0;
+
+			List<ABObject> birds = vision.findBirdsMBR();
+			for (ABObject bird :birds)
+			{
+				total += bird.getTotal();
+			}
+
+			List<ABObject> pigs = vision.findPigsRealShape();
+			for (ABObject pig : pigs)
+			{
+				total += pig.getTotal();
+			}
+
+        	List<ABObject> blocks = vision.findBlocksRealShape();
+        	for (ABObject block :blocks)
+			{
+				total += block.getTotal();
+			}
+
+			if ((DLUtils.isBirdLeft(blocks,pigs,birds) 
+					|| DLUtils.isBirdRight(blocks,pigs,birds))
+				&& Math.abs(last-total) <= 1)
+				break;
+
+			last = total;
+
+			try 
+			{
+				Thread.sleep(500);
+			} 
+			catch (InterruptedException e) 
+			{
+				e.printStackTrace();
+			}
+		}	
+
+	}
+
+	public void cshoot(Shot shot, TrajectoryPlanner tp, Rectangle sling, ABType birdOnSling, List<ABObject> blocks, List<ABObject> birds)
+	{
 		ShootingSchema ss = new ShootingSchema();
 		LinkedList<Shot> shots = new LinkedList<Shot>();
+		
 		shots.add(shot);
 		ss.shoot(proxy, shots);
-		System.out.println("Shooting Completed");
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
 
+		try 
+		{
+			Thread.sleep(5000);
+		}
+		catch (InterruptedException e) 
+		{
 			e.printStackTrace();
 		}
+
+      
+		waitingForSceneToBeSteady(birds);
 	}
 
 	public void cFastshoot(Shot shot) {
@@ -212,7 +295,21 @@ public class ActionRobot {
 			e.printStackTrace();
 		}
 	}
-
+	public void solveStart()
+	{
+		click();
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		click();
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}	
+	}
 	public static BufferedImage doScreenShot() {
 		byte[] imageBytes = proxy.send(new ProxyScreenshotMessage());
 		BufferedImage image = null;
@@ -228,30 +325,9 @@ public class ActionRobot {
 	 * @return the type of the bird on the sling.
 	 * 
 	 * **/
-	public ABType getBirdTypeOnSling()
+	public ABType getBirdTypeOnSling() throws IOException
 	{
-		fullyZoomIn();
-		BufferedImage screenshot = doScreenShot();
-		Vision vision = new Vision(screenshot);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			
-			e.printStackTrace();
-		}
-		fullyZoomOut();
-		List<ABObject> _birds = vision.findBirdsMBR();
-		if(_birds.isEmpty())
-			return ABType.Unknown;
-		Collections.sort(_birds, new Comparator<Rectangle>(){
-
-			@Override
-			public int compare(Rectangle o1, Rectangle o2) {
-				
-				return ((Integer)(o1.y)).compareTo((Integer)(o2.y));
-			}	
-		});
-		return _birds.get(0).getType();
+		throw new IOException("This should not be called!");
 	}
 
 	public static void main(String args[]) {

@@ -203,7 +203,7 @@ public class NaiveAgent implements Runnable {
 						System.out.println("Release Angle: "
 								+ Math.toDegrees(releaseAngle));
 						int tapInterval = 0;
-						switch (aRobot.getBirdTypeOnSling()) 
+						/*switch (aRobot.getBirdTypeOnSling()) 
 						{
 
 						case RedBird:
@@ -218,7 +218,7 @@ public class NaiveAgent implements Runnable {
 							tapInterval =  65 + randomGenerator.nextInt(20);break; // 65-85% of the way
 						default:
 							tapInterval =  60;
-						}
+						}*/
 
 						int tapTime = tp.getTapTime(sling, releasePoint, _tpt, tapInterval);
 						dx = (int)releasePoint.getX() - refPoint.x;
@@ -245,7 +245,7 @@ public class NaiveAgent implements Runnable {
 						{
 							if(dx < 0)
 							{
-								aRobot.cshoot(shot);
+								//aRobot.cshoot(shot);
 								state = aRobot.getState();
 								if ( state == GameState.PLAYING )
 								{

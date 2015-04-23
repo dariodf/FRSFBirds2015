@@ -1,19 +1,25 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014,XiaoYu (Gary) Ge, Stephen Gould, Jochen Renz
- **  Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
 package ab.vision;
 
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.List;
 
-public class Vision {
+import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
+
+public class Vision 
+{
 	private BufferedImage image;
 	private VisionMBR visionMBR = null;
 	private VisionRealShape visionRealShape = null;
@@ -22,7 +28,81 @@ public class Vision {
 	{
 		this.image = image;
 	}
-	
+
+	public ABType getBirdTypeOnSling()
+	{	
+		List<ABObject> _birds = findBirdsRealShape();
+
+		if (_birds.isEmpty())
+		{
+			return ABType.Unknown;
+		}
+
+		Collections.sort(_birds, new Comparator<Rectangle>()
+		{
+			@Override
+			public int compare(Rectangle o1, Rectangle o2)
+			{			
+				return ((Integer)(o1.y)).compareTo((Integer)(o2.y));
+			}	
+		});
+
+		Rectangle sling = findSlingshotRealShape();
+
+		ABObject possibleBirdOnSling = _birds.get(0);
+
+		if (sling != null
+			&& sling.x < possibleBirdOnSling.x 
+			&& sling.x + sling.width > (int) possibleBirdOnSling.getCenterX() )
+		{
+			return possibleBirdOnSling.type;
+		}
+
+		return ABType.Unknown;	
+	}	
+
+	//getBird
+	public ABObject getBirdTypeOnSlingObject()
+	{	
+		List<ABObject> _birds = findBirdsRealShape();
+
+		if (_birds.isEmpty())
+		{
+			return null;
+		}
+
+		Collections.sort(_birds, new Comparator<Rectangle>()
+		{
+			@Override
+			public int compare(Rectangle o1, Rectangle o2)
+			{			
+				return ((Integer)(o1.y)).compareTo((Integer)(o2.y));
+			}	
+		});
+
+		Rectangle sling = findSlingshotRealShape();
+
+		ABObject possibleBirdOnSling = _birds.get(0);
+
+		if (sling != null
+			&& sling.x < possibleBirdOnSling.x 
+			&& sling.x + sling.width > (int) possibleBirdOnSling.getCenterX() )
+		{
+			return possibleBirdOnSling;
+		}
+
+		return null;	
+	}
+
+	public int getGroundLevel()
+	{
+		if (visionRealShape == null)
+		{
+			visionRealShape = new VisionRealShape(image);
+		} 
+		return visionRealShape.getGroundLevel();		
+		
+	}
 	public List<ABObject> findBirdsMBR()
 	{
 		if (visionMBR == null)
@@ -46,7 +126,7 @@ public class Vision {
 	
 	public List<ABObject> findTNTs()
 	{
-		if(visionMBR == null)
+		if (visionMBR == null)
 		{
 			visionMBR = new VisionMBR(image);
 		}
@@ -62,16 +142,17 @@ public class Vision {
 	}
 	public List<ABObject> findPigsRealShape()
 	{
-		if(visionRealShape == null)
+		if (visionRealShape == null)
 		{
 			visionRealShape = new VisionRealShape(image);
 		}
 		
 		return visionRealShape.findPigs();
+		
 	} 
 	public List<ABObject> findBirdsRealShape()
 	{
-		if(visionRealShape == null)
+		if (visionRealShape == null)
 		{
 			visionRealShape = new VisionRealShape(image);
 		}
@@ -81,7 +162,7 @@ public class Vision {
 	
 	public List<ABObject> findHills()
 	{
-		if(visionRealShape == null)
+		if (visionRealShape == null)
 		{
 			visionRealShape = new VisionRealShape(image);
 		}
@@ -98,6 +179,15 @@ public class Vision {
 		}
 		return visionMBR.findSlingshotMBR();
 	}
+	public Rectangle findSlingshotRealShape()
+	{
+		if (visionRealShape == null)
+		{
+			visionRealShape = new VisionRealShape(image);
+		}
+		
+		return visionRealShape.findSling();
+	}
 	public List<Point> findTrajPoints()
 	{
 		if (visionMBR == null)
@@ -111,7 +201,7 @@ public class Vision {
 	 * */
 	public List<ABObject> findBlocksRealShape()
 	{
-		if(visionRealShape == null)
+		if (visionRealShape == null)
 		{
 			visionRealShape = new VisionRealShape(image);
 		}
@@ -119,9 +209,10 @@ public class Vision {
 		
 		return allBlocks;
 	}
+
 	public VisionMBR getMBRVision()
 	{
-		if(visionMBR == null)
+		if (visionMBR == null)
 			visionMBR = new VisionMBR(image);
 		return visionMBR;
 	}

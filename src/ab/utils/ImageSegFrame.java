@@ -1,11 +1,13 @@
 /*****************************************************************************
-** ANGRYBIRDS AI AGENT FRAMEWORK
-** Copyright (c) 2014,XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
-**  Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
-** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
-*****************************************************************************/
+ ** ANGRYBIRDS AI AGENT FRAMEWORK
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
+ ** All rights reserved.
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+ *****************************************************************************/
 package ab.utils;
 
 import java.awt.BasicStroke;
@@ -99,7 +101,7 @@ public class ImageSegFrame {
         {
         	Graphics2D g = (Graphics2D)getGraphics();
         	paint(g);
-        	if(_img != null)
+        	if (_img != null)
         	{
         	
         		g.setColor(Color.red);
@@ -271,7 +273,7 @@ public class ImageSegFrame {
   	    Insets insets = frame.getInsets();
   	    frame.setSize(img.getWidth(null) + insets.left + insets.right,
   	        img.getHeight(null) + insets.top + insets.bottom);
-  	    if(bound_x != -1 && bound_y != -1)
+  	    if (bound_x != -1 && bound_y != -1)
   	    	frame.setBounds(bound_x, bound_y, frame.getSize().width, frame.getSize().height);
   	    else
   	    {
@@ -285,7 +287,7 @@ public class ImageSegFrame {
   	    
   	    }
           frame.setVisible(true);
-          if(img != null && meta != null)
+          if (img != null && meta != null)
           	panel.refresh(img, meta);
     }
     public ImageSegFrame(String name, Image img, int[][] meta) {
@@ -303,7 +305,7 @@ public class ImageSegFrame {
 	    Insets insets = frame.getInsets();
 	    frame.setSize(img.getWidth(null) + insets.left + insets.right,
 	        img.getHeight(null) + insets.top + insets.bottom);
-	    if(bound_x != -1 && bound_y != -1)
+	    if (bound_x != -1 && bound_y != -1)
 	    	frame.setBounds(bound_x, bound_y, frame.getSize().width, frame.getSize().height);
 	    else
   	    {      
@@ -314,7 +316,7 @@ public class ImageSegFrame {
   	    }
         frame.setVisible(true);
     	frame.setResizable(false);
-        if(img != null && meta != null)
+        if (img != null && meta != null)
         	panel.refresh(img, meta);
        
         //panel.requestFocus();
@@ -363,10 +365,10 @@ public class ImageSegFrame {
     public static void main(String args[]) throws InterruptedException, IOException
     {
     	long timegap = 0;
-    	if(args.length == 1)
+    	if (args.length == 1)
     		ImageSegFrame.saveFileDir = (args[0]) + "";
     	else
-    		if(args.length == 2)
+    		if (args.length == 2)
     		{
     			ImageSegFrame.saveFileDir = args[0] + "";
     			timegap = Long.parseLong(args[1]); 
@@ -382,7 +384,7 @@ public class ImageSegFrame {
     	long avg = 0;
     	while(true)
     	{
-    		if(recordScreenshot){
+    		if (recordScreenshot){
     			time = System.nanoTime();
     			screenshot = ActionRobot.doScreenShot();
     			images.add(screenshot);
@@ -394,11 +396,11 @@ public class ImageSegFrame {
     			screenshot = ActionRobot.doScreenShot();
     		}
     		frame.refresh(screenshot);
-    		if(saveAndExit)
+    		if (saveAndExit)
     		{
     			saveFileDir += "_" + (avg/images.size()/1000000) + "\\";
     			File file = new File(ImageSegFrame.saveFileDir);
-    	    	if(!file.exists())
+    	    	if (!file.exists())
     	    		file.mkdir();
     		  for (BufferedImage image : images)
     		  {
@@ -410,13 +412,6 @@ public class ImageSegFrame {
     		}
     	}
     	
-/*    	if(recordScreenshot)
-    		for (BufferedImage image : images)
-    		{
-    			String imgFilename = saveFileDir + String.format("img%04d.png", _saveCount ++);
-    			ImageIO.write(image, "png", new File(imgFilename));
-    		}
-    	*/
     
     
     }

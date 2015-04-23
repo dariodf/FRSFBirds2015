@@ -1,10 +1,12 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014, XiaoYu (Gary) Ge, Stephen Gould, Jochen Renz
- **  Sahan Abeyasinghe,Jim Keys,  Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
  
 package ab.vision.real;
@@ -13,6 +15,9 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
+import java.awt.Color;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -153,6 +158,16 @@ public class ConnectedComponent {
             _image[p.y-_top][p.x-_left] = EDGE;
          
         _perimeter = _edgePoints.size();
+    }
+
+    public int getWidth()
+    {
+        return _width;
+    }
+
+    public int getHeight()
+    {
+        return _height;
     }
     
     /* Trace the contour using Moore-Neighbour tracing 
@@ -335,7 +350,7 @@ public class ConnectedComponent {
         if (areaMin > actualArea * JOIN_THRESHOLD)
         {  
         
-        	if ( (_area + _perimeter) > 400 )
+        	if ((_area + _perimeter) > 400 )
         	{
             	return poly;
         	} 
@@ -459,6 +474,28 @@ public class ConnectedComponent {
                 canvas.setRGB(x+_left, y+_top, 0x000000);
             }
         }
+
+        String typeName = "";
+
+        if (_type == ImageSegmenter.SLING)
+            typeName = "sling";
+        // else if (_type == ImageSegmenter.HILLS)
+        //     typeName = "hills";
+        // else if (_type == ImageSegmenter.WOOD)
+        //     typeName = "wood";
+        // else if (_type == ImageSegmenter.STONE)
+        //     typeName = "stone";
+        // else if (_type == ImageSegmenter.ICE)
+        //     typeName = "ice";
+        // else if (_type == ImageSegmenter.PIG)
+        //     typeName = "pig";
+        // else if (_type == ImageSegmenter.RED_BIRD)
+        //     typeName = "red bird";
+
+        Graphics2D g2d = canvas.createGraphics();
+
+        g2d.setColor(Color.cyan);
+        g2d.drawString(typeName,_left,_top);
         
         
         if (drawCorners)

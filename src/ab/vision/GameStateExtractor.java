@@ -1,10 +1,12 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014,XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
- **  Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
 
 package ab.vision;
@@ -22,7 +24,7 @@ import javax.imageio.ImageIO;
 public class GameStateExtractor {
 
 	public enum GameState {
-		 UNKNOWN, MAIN_MENU, EPISODE_MENU, LEVEL_SELECTION, LOADING, PLAYING, WON, LOST
+		 UNKNOWN, MAIN_MENU, EPISODE_MENU, LEVEL_SELECTION, LOADING, PLAYING, WON, LOST,CONTINUE,EAGLE,TUTORIAL
 	}
 
     static int repeatCount = 0;
@@ -51,6 +53,11 @@ public class GameStateExtractor {
 	private static BufferedImage _endGame8 = null;
 	private static BufferedImage _endGame9 = null;
 
+	private static BufferedImage[] endGameNumberTemplates = new BufferedImage[10];
+	//custom images
+	private static BufferedImage _gamecontinue = null;
+	private static BufferedImage _eagle = null;
+     private static BufferedImage _tutorialok = null;
 	
 
 	private static class RectLeftOf implements java.util.Comparator<Rectangle> {
@@ -98,7 +105,22 @@ public class GameStateExtractor {
 					"resources/8endScreen.png"));
 			_endGame9 = ImageIO.read(getClass().getResource(
 					"resources/9endScreen.png"));
-
+		  _gamecontinue = ImageIO.read(getClass().getResource(
+					"resources/continue.png"));
+		_eagle = ImageIO.read(getClass().getResource(
+					"resources/eagle.png"));
+	   _tutorialok = ImageIO.read(getClass().getResource(
+					"resources/tutorialok.png"));
+		endGameNumberTemplates[0] = extractNumber(_endGame0);
+		endGameNumberTemplates[1] = extractNumber(_endGame1);
+		endGameNumberTemplates[2] = extractNumber(_endGame2);
+		endGameNumberTemplates[3] = extractNumber(_endGame3);
+		endGameNumberTemplates[4] = extractNumber(_endGame4);
+		endGameNumberTemplates[5] = extractNumber(_endGame5);
+		endGameNumberTemplates[6] = extractNumber(_endGame6);
+		endGameNumberTemplates[7] = extractNumber(_endGame7);
+		endGameNumberTemplates[8] = extractNumber(_endGame8);
+		endGameNumberTemplates[9] = extractNumber(_endGame9);
 		} catch (IOException e) {
 			System.err.println("failed to load resources");
 			e.printStackTrace();
@@ -145,6 +167,24 @@ public class GameStateExtractor {
 		if (VisionUtils.imageDifference(wnd, _gamelost) < numBytes
 				* avgColourThreshold) {
 			return GameState.LOST;
+		}
+		wnd = screenshot.getSubimage(13,12,33,33);
+		numBytes = 3 * wnd.getWidth() * wnd.getHeight();
+		if (VisionUtils.imageDifference(wnd, _gamecontinue) < numBytes
+				* avgColourThreshold) {
+			return GameState.CONTINUE;
+		}
+		wnd = screenshot.getSubimage(151,330,41,40);
+		numBytes = 3 * wnd.getWidth() * wnd.getHeight();
+		if (VisionUtils.imageDifference(wnd, _eagle) < numBytes
+				* avgColourThreshold) {
+			return GameState.EAGLE;
+		}
+	    wnd = screenshot.getSubimage(497,318,28,25);
+		numBytes = 3 * wnd.getWidth() * wnd.getHeight();
+		if (VisionUtils.imageDifference(wnd, _tutorialok) < numBytes
+				* avgColourThreshold) {
+			return GameState.TUTORIAL;
 		}
 
 		return GameState.PLAYING;
@@ -237,12 +277,12 @@ public class GameStateExtractor {
 		
 
         // transform template images into black-white format
-		BufferedImage[] endGameNumberTemplates = { extractNumber(_endGame0),
+	/* BufferedImage[] endGameNumberTemplates = { extractNumber(_endGame0),
 				extractNumber(_endGame1), extractNumber(_endGame2),
 				extractNumber(_endGame3), extractNumber(_endGame4),
 				extractNumber(_endGame5), extractNumber(_endGame6),
 				extractNumber(_endGame7), extractNumber(_endGame8),
-				extractNumber(_endGame9) };
+				extractNumber(_endGame9) };*/
 		
         
 		// extract characters
@@ -275,7 +315,7 @@ public class GameStateExtractor {
 			//loop to find a template with minimum difference
 			for (int j = 0; j < 10; j++) {
 		        int diff = getPixelDifference(letterImage, endGameNumberTemplates[j]);
-				if(diff < minDiff){
+				if (diff < minDiff){
 					minDiff = diff;
 					value = j;
 				}

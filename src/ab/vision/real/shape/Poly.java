@@ -1,10 +1,12 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014, XiaoYu (Gary) Ge, Stephen Gould, Jochen Renz
- **  Sahan Abeyasinghe,Jim Keys,  Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
 package ab.vision.real.shape;
 
@@ -14,12 +16,13 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.awt.geom.Area;
 
 import ab.vision.ABShape;
 import ab.vision.ABType;
 import ab.vision.real.ImageSegmenter;
 import ab.vision.real.LineSegment;
-
+import dl.utils.DLUtils;
 public class Poly extends Body
 {
 	/**
@@ -47,6 +50,8 @@ public class Poly extends Body
         area = getBounds().height * getBounds().width;
         this.type = type;
         super.setBounds(polygon.getBounds());
+        _ar = new Area(polygon);
+        _shiftar = DLUtils.resize(polygon);
     }
     @Override
     public Rectangle getBounds()
@@ -63,10 +68,18 @@ public class Poly extends Body
             g.setColor(boxColor);
             g.drawPolygon(polygon);
         }
+       
     }
+	
+	@Override
+	public boolean contains(Point pt)
+	{
+	  	return polygon.contains(pt);	
+	}
 	
 	public String toString()
 	{
-		return String.format("Poly: id:%d type:%s hollow:%b %dpts at x:%3.1f y:%3.1f", id, type, hollow, polygon.npoints, centerX, centerY);
+		return "Poly";
+        //return String.format("Poly: id:%d type:%s hollow:%b %dpts at x:%3.1f y:%3.1f", id, type, hollow, polygon.npoints, centerX, centerY);
 	}
 }

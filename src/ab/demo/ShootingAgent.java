@@ -1,3 +1,13 @@
+/*****************************************************************************
+ ** ANGRYBIRDS AI AGENT FRAMEWORK
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
+ ** All rights reserved.
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+ *****************************************************************************/
 package ab.demo;
 
 import java.awt.Point;
@@ -34,11 +44,11 @@ public class ShootingAgent {
 		int x = Integer.parseInt(args[1]);
 		int y = Integer.parseInt(args[2]);
 		int tap = 0;
-		if(args.length > 3)
+		if (args.length > 3)
 			tap = Integer.parseInt(args[3]);
 		
 		Shot shot = null;
-		if(cshoot)
+		if (cshoot)
 			shot = new Shot( refPoint.x, refPoint.y, -x, y,0,tap);
 		else
 		{
@@ -50,9 +60,9 @@ public class ShootingAgent {
 		}
 		vision = new Vision(ActionRobot.doScreenShot());
 		Rectangle _slingshot = vision.findSlingshotMBR();
-		if(!slingshot.equals(_slingshot))
+		if (!slingshot.equals(_slingshot))
 			System.out.println("the scale is changed, the shot might not be executed properly.");
-		ar.cshoot(shot);
+		//ar.cshoot(shot);
 		System.exit(0);
 	}
 	

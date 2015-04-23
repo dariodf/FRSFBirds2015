@@ -1,10 +1,12 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014, XiaoYu (Gary) Ge, Stephen Gould, Jochen Renz
- **  Sahan Abeyasinghe,Jim Keys,  Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
 package ab.vision.real.shape;
 
@@ -12,9 +14,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.geom.Area;
+import java.awt.Point;
 
 import ab.vision.ABType;
 import ab.vision.real.ImageSegmenter;
+import dl.utils.DLUtils;
 
 public class Rect extends Body
 {
@@ -25,17 +30,18 @@ public class Rect extends Body
     
     public double getpWidth()
     {
-	   	 if(pwidth != -1)
+	   	 if (pwidth != -1)
 	   		 return pwidth;
 	   	 return width;
     }
     
     public double getpLength()
     {
-	   	 if(plength != -1)
+	   	 if (plength != -1)
 	   		 return plength;
 	   	 return height;
     }
+
     public Rect(double xs, double ys,  double w, double h, double theta, ABType type)
     {
         
@@ -64,7 +70,8 @@ public class Rect extends Body
         super.setBounds(p.getBounds());
         width = p.getBounds().width;
   	  	height = p.getBounds().height;
-
+		_ar = new Area(p);
+		_shiftar = DLUtils.resize(p);
     } 
 
 
@@ -139,6 +146,8 @@ public class Rect extends Body
         
         area = width * height;
         createPolygon();
+        _ar = new Area(p);
+        _shiftar = DLUtils.resize(p);
       
     }
     public Rect(double centerX, double centerY, double pwidth, double plength, double angle, ABType type, int area)
@@ -154,7 +163,8 @@ public class Rect extends Body
     	  super.setBounds(p.getBounds());
     	  width = p.getBounds().width;
     	  height = p.getBounds().height;
-          	
+        _ar = new Area(p);    	
+        _shiftar = DLUtils.resize(p);
     }
 
     
@@ -177,9 +187,15 @@ public class Rect extends Body
     {
         return angle > Math.PI / 2 ? angle - Math.PI / 2 : angle + Math.PI / 2;
     }
-	
+    
+	@Override
+	public boolean contains(Point pt)
+	{
+	  	return p.contains(pt);	
+	}
 	public String toString()
 	{
-		return String.format("Rect: id:%d type:%s hollow:%b Area:%d w:%7.3f h:%7.3f a:%3.3f at x:%3.1f y:%3.1f", id, type, hollow, area, pwidth, plength, angle, centerX, centerY);
+		//return String.format("Rect: id:%d type:%s hollow:%b Area:%d w:%7.3f h:%7.3f a:%3.3f at x:%3.1f y:%3.1f", id, type, hollow, area, pwidth, plength, angle, centerX, centerY);
+        return "Rect";
 	}
 }

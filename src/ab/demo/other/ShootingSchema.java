@@ -1,11 +1,13 @@
 /*****************************************************************************
-** ANGRYBIRDS AI AGENT FRAMEWORK
-** Copyright (c) 2014,XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
-**  Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
-** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
-*****************************************************************************/
+ ** ANGRYBIRDS AI AGENT FRAMEWORK
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
+ ** All rights reserved.
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+ *****************************************************************************/
 package ab.demo.other;
 
 import java.util.Collections;
@@ -27,21 +29,21 @@ public void shoot(final Proxy proxy,List<Shot> csc)
 {
 	int count = 0;
 	LinkedList<Shot> shots = new LinkedList<Shot>();	
-    for(Shot shot:csc)
+    for (Shot shot:csc)
     {
-    	if(shot.getT_shot() != 0)
+    	if (shot.getT_shot() != 0)
     		 shootImmediately = false;
-    	if(shootImmediately)
+    	if (shootImmediately)
     	{
     		int t_shot = 5000 * count++;
     		shots.add(new Shot(shot.getX(),shot.getY(),shot.getDx(),shot.getDy(),t_shot));
-    		if(shot.getT_tap() > 0)
+    		if (shot.getT_tap() > 0)
         		shots.add(new  Shot(0,0,0,0, shot.getT_tap() + t_shot));
     	}
     	else
     	{
     		shots.add(new  Shot(shot.getX(),shot.getY(),shot.getDx(),shot.getDy(),shot.getT_shot()));
-    		if(shot.getT_tap() > 0)
+    		if (shot.getT_tap() > 0)
         		shots.add(new Shot(0,0,0,0,shot.getT_tap() + shot.getT_shot()));
     	}
     	
@@ -55,14 +57,14 @@ public void shoot(final Proxy proxy,List<Shot> csc)
 			return ((Integer)arg0.getT_shot()).compareTo(arg1.getT_shot());
 		}
     	});
-	if(!shots.isEmpty())
+	if (!shots.isEmpty())
 	{
 			   int start_time = shots.getFirst().getT_shot();
 		       //Optimize for one shot one time..
-			   if(shots.size() < 3)
+			   if (shots.size() < 3)
 			   {
 				   Shot shot = shots.getFirst();
-				   if(shots.size() == 2)
+				   if (shots.size() == 2)
 				   {
 					   Shot _shot = shots.getLast();
 					   int wait_time = (_shot.getT_shot() - start_time)==0? start_time:(_shot.getT_shot()- start_time);
@@ -70,7 +72,7 @@ public void shoot(final Proxy proxy,List<Shot> csc)
 					   proxy.send(new ProxyDragMessage(shot.getX(),shot.getY(),shot.getDx(),shot.getDy()));
 					   long gap = System.currentTimeMillis() - _gap;
 					   wait_time -= gap;
-					   if(wait_time < 0)
+					   if (wait_time < 0)
 						   wait_time = 0;
 					   //long time = System.nanoTime();
 					   try {
@@ -93,7 +95,7 @@ public void shoot(final Proxy proxy,List<Shot> csc)
 			   else
 			   {  
 				   long gap = 0;
-				   for(Shot _shot: shots)
+				   for (Shot _shot: shots)
 				   {
 					   long wait_time = (_shot.getT_shot() - start_time - gap) <=0 ? 0:(_shot.getT_shot()- start_time - gap);
 					   

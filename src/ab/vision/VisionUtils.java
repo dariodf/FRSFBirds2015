@@ -1,10 +1,12 @@
 /*****************************************************************************
  ** ANGRYBIRDS AI AGENT FRAMEWORK
- ** Copyright (c) 2014,XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
- **  Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
  ** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *****************************************************************************/
 
 package ab.vision;
@@ -94,6 +96,25 @@ public class VisionUtils {
         }
 
         return diff;
+    }
+    // function returns true if the screenshot contains the scene
+    // where the information about the Level completion is
+    public static boolean containsBlack(BufferedImage img)
+    {
+    	int diff = 0;
+    	for (int x = 350; x < 400; ++x)
+    	{
+    		int color = img.getRGB(x,475);
+    		diff += color & 0x000000ff;
+    		diff += (color & 0x0000ff00) >> 8;
+    		diff += (color & 0x00ff0000) >> 16;
+    	}
+
+    	if (diff < 100)
+    		return true;
+    	else 
+    		return false;
+
     }
 
 	// compute an image digest

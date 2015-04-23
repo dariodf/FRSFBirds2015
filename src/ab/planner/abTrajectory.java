@@ -1,13 +1,14 @@
-package ab.planner;
-
 /*****************************************************************************
-** ANGRYBIRDS AI AGENT FRAMEWORK
-** Copyright (c) 2014, XiaoYu (Gary) Ge, Jochen Renz, Stephen Gould,
-**  Sahan Abeyasinghe,Jim Keys,   Andrew Wang, Peng Zhang
-** All rights reserved.
-**This work is licensed under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-**To view a copy of this license, visit http://www.gnu.org/licenses/
-*****************************************************************************/
+ ** ANGRYBIRDS AI AGENT FRAMEWORK
+ ** Copyright (c) 2015,  XiaoYu (Gary) Ge, Stephen Gould,Jochen Renz
+ ** Sahan Abeyasinghe, Jim Keys,   Andrew Wang, Peng Zhang
+ ** Team DataLab Birds: Karel Rymes, Radim Spetlik, Tomas Borovicka
+ ** All rights reserved.
+ **This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ **To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+ *****************************************************************************/
+package ab.planner;
 
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -15,11 +16,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import ab.planner.TrajectoryPlanner;
 import ab.server.Proxy;
 import ab.server.proxy.message.ProxyScreenshotMessage;
 import ab.utils.ImageSegFrame;
@@ -45,6 +46,8 @@ public class abTrajectory {
 			}
                     };
 		server.start();
+
+        System.out.println("abTrajectory is running which should not be the case!");
 
 		System.out.println("Server started on port: " + server.getPort());
 
@@ -92,20 +95,9 @@ public class abTrajectory {
 
             // process image
             VisionMBR vision = new VisionMBR(screenshot);
-            //List<Rectangle> pigs = vision.findPigsMBR();
-            
+            List<Rectangle> pigs = vision.findPigsMBR();
             List<Rectangle> redBirds = vision.findRedBirdsMBRs();
-            List<Rectangle> yellowBirds = vision.findYellowBirdsMBRs();
-            List<Rectangle> blueBirds = vision.findBlueBirdsMBRs();
-            List<Rectangle> whiteBirds = vision.findWhiteBirdsMBRs();
-            List<Rectangle> blackBirds = vision.findBlackBirdsMBRs();
-            List<Rectangle> birds = new LinkedList<Rectangle>();
-            birds.addAll(redBirds);
-            birds.addAll(yellowBirds);
-            birds.addAll(blueBirds);
-            birds.addAll(blackBirds);
-            birds.addAll(whiteBirds);
-            
+
             Rectangle sling = vision.findSlingshotMBR();
             if (sling == null) {
                 System.out.println("...could not find the slingshot");
@@ -115,13 +107,13 @@ public class abTrajectory {
             System.out.println("...found slingshot at " + sling.toString());
 
             // convert screenshot to grey scale and draw bounding boxes
-            //screenshot = VisionUtils.convert2grey(screenshot);
-            //VisionUtils.drawBoundingBoxes(screenshot, pigs, Color.GREEN);
+            screenshot = VisionUtils.convert2grey(screenshot);
+            VisionUtils.drawBoundingBoxes(screenshot, pigs, Color.GREEN);
             VisionUtils.drawBoundingBoxes(screenshot, redBirds, Color.PINK);
             VisionUtils.drawBoundingBox(screenshot, sling, Color.ORANGE);
 
             // find active bird
-            Rectangle activeBird = trajectory.findActiveBird(birds);
+            Rectangle activeBird = trajectory.findActiveBird(redBirds);
             if (activeBird == null) {
                 System.out.println("...could not find active bird");
                 continue;
