@@ -156,6 +156,7 @@ public class VisionRealShape
           if (_sling != null)
               xMin = _sling.x + 100;
           List<ABObject> pigs = new LinkedList<ABObject>();
+          List<ABObject> pigs_temp = new LinkedList<ABObject>();
           for (ConnectedComponent c : _components)
           {
               if (c.getType() == ImageSegmenter.PIG)
@@ -169,7 +170,29 @@ public class VisionRealShape
               }
               
           }
-          return pigs;
+          
+          //TODO ordenar bien por: pigs.get(index).getWidth();
+          //System.out.println("\n\nGordura del chanchus " + pigs.get(0).getWidth() + "\n\n");
+          
+          while(!pigs.isEmpty()) {
+        	  double mayor = pigs.get(0).getWidth();
+        	  int index = 0;
+        	  for(int i = 1; i < pigs.size(); i++){
+				if(pigs.get(i).getWidth() > mayor){
+					index = i;
+					mayor = pigs.get(i).getWidth();
+				}
+        	  }
+        	  
+        	  pigs_temp.add(pigs.get(index));
+        	  //System.out.println();
+        	  //System.out.println("chacno: " + pigs.get(index).getWidth());
+        	  //System.out.println();
+        	  pigs.remove(index);
+        	  
+          }
+                    
+          return pigs_temp;
     }
     public List<ABObject> findHills()
     {

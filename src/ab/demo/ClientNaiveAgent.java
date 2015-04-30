@@ -223,7 +223,7 @@ public class ClientNaiveAgent implements Runnable {
 
 		
 		 // get all the pigs
- 		List<ABObject> pigs = vision.findPigsMBR();
+ 		List<ABObject> pigs = vision.findPigsRealShape();
  		List<ABObject> blocks = vision.findBlocksRealShape();
  		for (ABObject block : blocks) {
  			 System.out.println(block.toString());
@@ -232,14 +232,20 @@ public class ClientNaiveAgent implements Runnable {
 		GameState state = ar.checkState();
 		// if there is a sling, then play, otherwise skip.
 		if (sling != null) {
-			
-			
+						
 			//If there are pigs, we pick up a pig randomly and shoot it. 
 			if (!pigs.isEmpty()) {		
 				Point releasePoint = null;
-				// random pick up a pig
-					ABObject pig = pigs.get(randomGenerator.nextInt(pigs.size()));
+					// random pick up a pig
 					
+					
+					//ABObject pig = pigs.get(randomGenerator.nextInt(pigs.size()));
+					
+					ABObject pig = pigs.get(0);
+					/**********************************************/
+					/** TODO: IMPLEMENTAR INTELIGENCIA **/
+					/**********************************************/
+										
 					Point _tpt = pig.getCenter();
 
 					
