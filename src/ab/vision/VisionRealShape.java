@@ -16,9 +16,11 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import dl.utils.ABObjectComp;
 import ab.demo.other.ActionRobot;
 import ab.vision.real.ConnectedComponent;
 import ab.vision.real.ImageSegmenter;
@@ -174,25 +176,35 @@ public class VisionRealShape
           //TODO ordenar bien por: pigs.get(index).getWidth();
           //System.out.println("\n\nGordura del chanchus " + pigs.get(0).getWidth() + "\n\n");
           
-          while(!pigs.isEmpty()) {
-        	  double mayor = pigs.get(0).getWidth();
-        	  int index = 0;
-        	  for(int i = 1; i < pigs.size(); i++){
-				if(pigs.get(i).getWidth() > mayor){
-					index = i;
-					mayor = pigs.get(i).getWidth();
-				}
-        	  }
-        	  
-        	  pigs_temp.add(pigs.get(index));
-        	  //System.out.println();
-        	  //System.out.println("chacno: " + pigs.get(index).getWidth());
-        	  //System.out.println();
-        	  pigs.remove(index);
-        	  
-          }
-                    
-          return pigs_temp;
+//          while(!pigs.isEmpty()) {
+//        	  double mayor = pigs.get(0).getWidth();
+//        	  int index = 0;
+//        	  for(int i = 1; i < pigs.size(); i++){
+//				if(pigs.get(i).getWidth() > mayor){
+//					index = i;
+//					mayor = pigs.get(i).getWidth();
+//				}
+//        	  }
+//        	  
+//        	  pigs_temp.add(pigs.get(index));
+//        	  //System.out.println();
+//        	  //System.out.println("chacno: " + pigs.get(index).getWidth());
+//        	  //System.out.println();
+//        	  pigs.remove(index);
+//        	  
+//          }
+          
+          
+          ABObjectComp comparator = new ABObjectComp();
+          comparator.sortByWidth();
+          comparator.sortDesc();
+          Collections.sort(pigs, comparator);
+          System.out.println();
+          for (ABObject p : pigs) {
+        	  System.out.println("chancho: " + p.getWidth());
+		}
+          System.out.println();
+          return pigs;
     }
     public List<ABObject> findHills()
     {
