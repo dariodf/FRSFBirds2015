@@ -201,7 +201,7 @@ public class VisionRealShape
           Collections.sort(pigs, comparator);
           System.out.println();
           for (ABObject p : pigs) {
-        	  System.out.println("chancho: " + p.getWidth());
+        	  System.out.println("chancho: Diametro:" + p.getWidth() + "  Posicion: ( "+ p.x + ", " + p.y + ")");
 		}
           System.out.println();
           return pigs;

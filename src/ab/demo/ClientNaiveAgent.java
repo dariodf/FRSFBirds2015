@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import dl.heuristics.SceneState;
 import ab.demo.other.ClientActionRobot;
 import ab.demo.other.ClientActionRobotJava;
 import ab.planner.TrajectoryPlanner;
@@ -33,8 +34,7 @@ public class ClientNaiveAgent implements Runnable {
 	public int[] solved;
 	TrajectoryPlanner tp; 
 	private int id = 28888;
-	private boolean firstShot;
-	private Point prevTarget;
+	private SceneState Scene;
 	private Random randomGenerator;
 	/**
 	 * Constructor using the default IP
@@ -44,8 +44,7 @@ public class ClientNaiveAgent implements Runnable {
 		ar = new ClientActionRobotJava("127.0.0.1");
 		tp = new TrajectoryPlanner();
 		randomGenerator = new Random();
-		prevTarget = null;
-		firstShot = true;
+		this.Scene = new SceneState();
 
 	}
 	/**
@@ -55,8 +54,7 @@ public class ClientNaiveAgent implements Runnable {
 		ar = new ClientActionRobotJava(ip);
 		tp = new TrajectoryPlanner();
 		randomGenerator = new Random();
-		prevTarget = null;
-		firstShot = true;
+		this.Scene = new SceneState();
 
 	}
 	public ClientNaiveAgent(String ip, int id)
@@ -64,8 +62,7 @@ public class ClientNaiveAgent implements Runnable {
 		ar = new ClientActionRobotJava(ip);
 		tp = new TrajectoryPlanner();
 		randomGenerator = new Random();
-		prevTarget = null;
-		firstShot = true;
+		this.Scene = new SceneState();
 		this.id = id;
 	}
 	public int getNextLevel()
@@ -147,7 +144,7 @@ public class ClientNaiveAgent implements Runnable {
 				tp = new TrajectoryPlanner();
 
 				// first shot on this level, try high shot first
-				firstShot = true;
+				this.Scene.firstShot = true;
 				
 			} else 
 				//If lost, then restart the level
@@ -202,11 +199,11 @@ public class ClientNaiveAgent implements Runnable {
 		// process image
 		Vision vision = new Vision(screenshot);
 		
-		Rectangle sling = vision.findSlingshotMBR();
+		this.Scene.Sling = vision.findSlingshotMBR();
 		
 
 		//If the level is loaded (in PLAYING　state)but no slingshot detected, then the agent will request to fully zoom out.
-		while (sling == null && ar.checkState() == GameState.PLAYING) {
+		while (this.Scene.Sling == null && ar.checkState() == GameState.PLAYING) {
 			System.out.println("no slingshot detected. Please remove pop up or zoom out");
 			
 			try {
@@ -218,30 +215,37 @@ public class ClientNaiveAgent implements Runnable {
 			ar.fullyZoomOut();
 			screenshot = ar.doScreenShot();
 			vision = new Vision(screenshot);
-			sling = vision.findSlingshotMBR();
+			this.Scene.Sling = vision.findSlingshotMBR();
 		}
 
 		
-		 // get all the pigs
- 		List<ABObject> pigs = vision.findPigsRealShape();
- 		List<ABObject> blocks = vision.findBlocksRealShape();
- 		for (ABObject block : blocks) {
+ 		/// TODO: Si se necesitan los otros objetos en la pantalla Descomentar las lineas necesarias.
+ 		/// ( ^___^)b d(^___^ )
+		///
+		this.Scene.Pigs = vision.findPigsRealShape();
+		this.Scene.Blocks = vision.findBlocksRealShape();
+// 		this.Scene.Birds = vision.findBirdsRealShape(); // Birds
+// 		this.Scene.Hills = vision.findHills(); // Hills
+//		this.Scene.TNTs = vision.findTNTs(); // TNTs
+		this.Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
+ 		
+ 		for (ABObject block : this.Scene.Blocks) {
  			 System.out.println(block.toString());
  		}
  		
 		GameState state = ar.checkState();
 		// if there is a sling, then play, otherwise skip.
-		if (sling != null) {
+		if (this.Scene.Sling != null) {
 						
 			//If there are pigs, we pick up a pig randomly and shoot it. 
-			if (!pigs.isEmpty()) {		
+			if (!this.Scene.Pigs.isEmpty()) {		
 				Point releasePoint = null;
 					// random pick up a pig
 					
 					
-					//ABObject pig = pigs.get(randomGenerator.nextInt(pigs.size()));
+					//ABObject pig = this.Scene.Pigs.get(randomGenerator.nextInt(this.Scene.Pigs.size()));
 					
-					ABObject pig = pigs.get(0);
+					ABObject pig = this.Scene.Pigs.get(0);
 					/**********************************************/
 					/** TODO: IMPLEMENTAR INTELIGENCIA **/
 					/**********************************************/
@@ -251,20 +255,20 @@ public class ClientNaiveAgent implements Runnable {
 					
 					// if the target is very close to before, randomly choose a
 					// point near it
-					if (prevTarget != null && distance(prevTarget, _tpt) < 10) {
+					if (this.Scene.prevTarget != null && distance(this.Scene.prevTarget, _tpt) < 10) {
 						double _angle = randomGenerator.nextDouble() * Math.PI * 2;
 						_tpt.x = _tpt.x + (int) (Math.cos(_angle) * 10);
 						_tpt.y = _tpt.y + (int) (Math.sin(_angle) * 10);
 						System.out.println("Randomly changing to " + _tpt);
 					}
 
-					prevTarget = new Point(_tpt.x, _tpt.y);
+					this.Scene.prevTarget = new Point(_tpt.x, _tpt.y);
 
 					// estimate the trajectory
-					ArrayList<Point> pts = tp.estimateLaunchPoint(sling, _tpt);
+					ArrayList<Point> pts = tp.estimateLaunchPoint(this.Scene.Sling, _tpt);
 
 					// do a high shot when entering a level to find an accurate velocity
-					if (firstShot && pts.size() > 1) {
+					if (this.Scene.firstShot && pts.size() > 1) {
 						releasePoint = pts.get(1);
 					} else 
 						if (pts.size() == 1)
@@ -272,7 +276,7 @@ public class ClientNaiveAgent implements Runnable {
 						else 
 							if(pts.size() == 2)
 							{
-								// System.out.println("first shot " + firstShot);
+								// System.out.println("first shot " + this.Scene.firstShot);
 								// randomly choose between the trajectories, with a 1 in
 								// 6 chance of choosing the high one
 								if (randomGenerator.nextInt(6) == 0)
@@ -280,18 +284,18 @@ public class ClientNaiveAgent implements Runnable {
 								else
 								releasePoint = pts.get(0);
 							}
-							Point refPoint = tp.getReferencePoint(sling);
+							Point refPoint = tp.getReferencePoint(this.Scene.Sling);
 
 					// Get the release point from the trajectory prediction module
 					int tapTime = 0;
 					if (releasePoint != null) {
-						double releaseAngle = tp.getReleaseAngle(sling,
+						double releaseAngle = tp.getReleaseAngle(this.Scene.Sling,
 								releasePoint);
 						System.out.println("Release Point: " + releasePoint);
 						System.out.println("Release Angle: "
 								+ Math.toDegrees(releaseAngle));
 						int tapInterval = 0;
-						switch (ar.getBirdTypeOnSling()) 
+						switch (this.Scene.BirdOnSling) 
 						{
 
 							case RedBird:
@@ -308,7 +312,7 @@ public class ClientNaiveAgent implements Runnable {
 								tapInterval =  60;
 						}
 						
-						tapTime = tp.getTapTime(sling, releasePoint, _tpt, tapInterval);
+						tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, _tpt, tapInterval);
 						
 					} else
 						{
@@ -324,7 +328,7 @@ public class ClientNaiveAgent implements Runnable {
 					Rectangle _sling = vision.findSlingshotMBR();
 					if(_sling != null)
 					{
-						double scale_diff = Math.pow((sling.width - _sling.width),2) +  Math.pow((sling.height - _sling.height),2);
+						double scale_diff = Math.pow((this.Scene.Sling.width - _sling.width),2) +  Math.pow((this.Scene.Sling.height - _sling.height),2);
 						if(scale_diff < 25)
 						{
 							int dx = (int) releasePoint.getX() - refPoint.x;
@@ -340,8 +344,8 @@ public class ClientNaiveAgent implements Runnable {
 									screenshot = ar.doScreenShot();
 									vision = new Vision(screenshot);
 									List<Point> traj = vision.findTrajPoints();
-									tp.adjustTrajectory(traj, sling, releasePoint);
-									firstShot = false;
+									tp.adjustTrajectory(traj, this.Scene.Sling, releasePoint);
+									this.Scene.firstShot = false;
 								}
 							}
 						}
