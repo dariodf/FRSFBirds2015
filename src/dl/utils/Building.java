@@ -14,19 +14,18 @@ package dl.utils;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Color;
-
+import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import ab.vision.*;
 import ab.vision.real.shape.Rect;
-
 import ab.demo.other.ClientActionRobot;
 import ab.demo.other.ClientActionRobotJava;
-
 import ab.planner.TrajectoryPlanner;
 
 /**
@@ -922,4 +921,89 @@ public class Building
 		}
 
 	}
+	
+	/**
+	 * Dado una lista de bloques, se busca si existen construcciones.
+	 * @param blocks Listado de bloques que fueron identificados en la pantalla.
+	 * @return Lista de construcciones que fueron detectadas.
+	 */
+	public static List<Building> FindBuildings (List<ABObject> objs)
+    {
+        List<ABObject> tobevisited= new ArrayList<ABObject>(objs);
+        List<Building> boundingboxes = new ArrayList<Building> ();
+        
+        while(tobevisited.size() != 0){
+        	Building b = FindBuilding(tobevisited);
+        	if(b.blocks.size() > 1)
+        		boundingboxes.add(b);
+        }
+        System.out.println("\nSe han encontrado " + boundingboxes.size() + " Consrucciones.\n");
+        return boundingboxes;
+    }
+	
+	
+	/**
+	 * Dado una lista de bloques, se busca si existen construcciones.
+	 * @param blocks Listado de bloques que fueron identificados en la pantalla.
+	 * @return primer construccion encontrada..
+	 */
+	private static Building FindBuilding( List<ABObject> blocks){
+		
+		Queue<ABObject> fronta = new ArrayDeque<ABObject> ();
+        List<ABObject> total = new ArrayList<ABObject> ();
+        
+        fronta.add(blocks.get(0));
+        blocks.remove(0);
+        
+        while(fronta.size() != 0)
+        {
+            ABObject tmp = fronta.poll();
+            total.add(tmp);
+            
+            for (int i=0;i<blocks.size();++i)
+            {
+                if (tmp.touches(blocks.get(i) ) )
+                {
+                    fronta.add(blocks.get(i));
+                    blocks.remove(i);  
+                    --i;
+                }
+            }
+        }
+        Building bld = new Building(total);
+        return bld;
+	}
+	
+	/**
+	 * Dado una lista de bloques y la lista de chanchos, se busca si existen construcciones que contengan chanchos.
+	 * @param objs Listado de bloques que fueron identificados en la pantalla.
+	 * @param Piggies
+	 * @return Lista de construcciones que fueron detectadas.
+	 */
+	public static List<Building> FindBuildings (List<ABObject> objs, List<ABObject>Piggies)
+    {
+        List<Building> result = FindBuildings(objs);
+        
+        for (int i = 0; i < result.size(); i++) {
+        	Rectangle buildingBoundary = result.get(i).bounding;
+        	if(buildingBoundary == null)
+        		buildingBoundary = result.get(i).getBoundingRect();        		       		
+        	boolean havePig = false;
+        	for (int j = 0; j < Piggies.size(); j++) {
+        		if (Piggies.get(j).x >= buildingBoundary.x && Piggies.get(j).x <= buildingBoundary.x + buildingBoundary.width &&
+        			   Piggies.get(j).y >= buildingBoundary.y && Piggies.get(j).y <= buildingBoundary.y + buildingBoundary.height ) {
+        			havePig = true;
+        			break;
+				}
+        	}
+        	
+        	if(!havePig){
+        		result.remove(i);
+        		i--;
+        	}
+		}
+        System.out.println("\nSe han encontrado " + result.size() + " Consrucciones con chanchos dentro.\n");
+        return result;
+    }
+	
 }

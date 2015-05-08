@@ -11,9 +11,12 @@ package dl.heuristics;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import dl.utils.Building;
 import ab.vision.ABObject;
 import ab.vision.ABType;
 /**
@@ -29,6 +32,8 @@ public class SceneState
     
     public List<ABObject> Blocks;
     
+    public List<Building> Buildings;
+    
     public Rectangle Sling;
 
     public List<ABObject> TNTs; 
@@ -42,11 +47,13 @@ public class SceneState
     public SceneState(List<ABObject> pigs,List<ABObject> hills, List<ABObject> blocks,  Rectangle sling, List<ABObject> TNTs, Point prevTarget, boolean firstShot, List<ABObject> birds, ABType birdOnSling)
     {
     	Birds = birds;
-        BirdOnSling = birdOnSling;      
+        BirdOnSling = birdOnSling; 
+        
 
         Pigs = pigs;
         Hills = hills;
         Blocks = blocks;
+        this.Buildings = Building.FindBuildings(this.Blocks);
         Sling = sling;
         this.TNTs = TNTs;
 

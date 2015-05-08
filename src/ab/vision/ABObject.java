@@ -115,7 +115,12 @@ public class ABObject extends Rectangle
 	*/
 	public Area getBigger()
 	{
-		return _shiftar;
+		if( _shiftar == null){
+			Rectangle tmp = (Rectangle) this.clone();
+			tmp.grow(shift, shift);
+			this._shiftar = new Area(tmp);
+		}
+		return this._shiftar;
 	}
 	/**
 	*	@return true if this touches with obj, false otherwise; the enlarged area is used
@@ -128,8 +133,8 @@ public class ABObject extends Rectangle
 			&& height == obj.height)
 		return false;
 
-		Area tmp = (Area) _shiftar.clone();
-		tmp.intersect(obj._shiftar);
+		Area tmp = (Area) getBigger().clone();
+		tmp.intersect(obj.getBigger());
 		boolean ret = ! tmp.isEmpty();
 		return ret;
 	}

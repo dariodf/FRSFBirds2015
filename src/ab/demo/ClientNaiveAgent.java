@@ -12,10 +12,13 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import dl.heuristics.SceneState;
+import dl.utils.Building;
 import ab.demo.other.ClientActionRobot;
 import ab.demo.other.ClientActionRobotJava;
 import ab.planner.TrajectoryPlanner;
@@ -228,6 +231,9 @@ public class ClientNaiveAgent implements Runnable {
 // 		this.Scene.Hills = vision.findHills(); // Hills
 //		this.Scene.TNTs = vision.findTNTs(); // TNTs
 		this.Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
+//		this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks); // Construcciones
+		this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks, this.Scene.Pigs); // Construcciones con chanchos
+		
  		
  		for (ABObject block : this.Scene.Blocks) {
  			 System.out.println(block.toString());
@@ -240,120 +246,124 @@ public class ClientNaiveAgent implements Runnable {
 			//If there are pigs, we pick up a pig randomly and shoot it. 
 			if (!this.Scene.Pigs.isEmpty()) {		
 				Point releasePoint = null;
-					// random pick up a pig
-					
-					
-					//ABObject pig = this.Scene.Pigs.get(randomGenerator.nextInt(this.Scene.Pigs.size()));
-					
-					ABObject pig = this.Scene.Pigs.get(0);
-					/**********************************************/
-					/** TODO: IMPLEMENTAR INTELIGENCIA **/
-					/**********************************************/
-										
-					Point _tpt = pig.getCenter();
+				// random pick up a pig
+				
+				
+				//ABObject pig = this.Scene.Pigs.get(randomGenerator.nextInt(this.Scene.Pigs.size()));
+				
+				/**********************************************/
+				/** TODO: IMPLEMENTAR INTELIGENCIA **/
+				/**********************************************/
+				ABObject pig = this.Scene.Pigs.get(0);
+				
+				System.out.println();
+				System.out.println("Seleccionado Chancho[" + this.Scene.Pigs.indexOf(pig) + "] en la pos: ( " + pig.x + ", " + pig.y + " )");
+				System.out.println();
+				
+				Point _tpt = pig.getCenter();
 
-					
-					// if the target is very close to before, randomly choose a
-					// point near it
-					if (this.Scene.prevTarget != null && distance(this.Scene.prevTarget, _tpt) < 10) {
-						double _angle = randomGenerator.nextDouble() * Math.PI * 2;
-						_tpt.x = _tpt.x + (int) (Math.cos(_angle) * 10);
-						_tpt.y = _tpt.y + (int) (Math.sin(_angle) * 10);
-						System.out.println("Randomly changing to " + _tpt);
-					}
+				
+				// if the target is very close to before, randomly choose a
+				// point near it
+				if (this.Scene.prevTarget != null && distance(this.Scene.prevTarget, _tpt) < 10) {
+					double _angle = randomGenerator.nextDouble() * Math.PI * 2;
+					_tpt.x = _tpt.x + (int) (Math.cos(_angle) * 10);
+					_tpt.y = _tpt.y + (int) (Math.sin(_angle) * 10);
+					System.out.println("Randomly changing to " + _tpt);
+				}
 
-					this.Scene.prevTarget = new Point(_tpt.x, _tpt.y);
+				this.Scene.prevTarget = new Point(_tpt.x, _tpt.y);
 
-					// estimate the trajectory
-					ArrayList<Point> pts = tp.estimateLaunchPoint(this.Scene.Sling, _tpt);
+				// estimate the trajectory
+				ArrayList<Point> pts = tp.estimateLaunchPoint(this.Scene.Sling, _tpt);
 
-					// do a high shot when entering a level to find an accurate velocity
-					if (this.Scene.firstShot && pts.size() > 1) {
-						releasePoint = pts.get(1);
-					} else 
-						if (pts.size() == 1)
+				// do a high shot when entering a level to find an accurate velocity
+				if (this.Scene.firstShot && pts.size() > 1) {
+					releasePoint = pts.get(1);
+				} else 
+					if (pts.size() == 1)
+						releasePoint = pts.get(0);
+					else 
+						if(pts.size() == 2)
+						{
+							// System.out.println("first shot " + this.Scene.firstShot);
+							// randomly choose between the trajectories, with a 1 in
+							// 6 chance of choosing the high one
+							if (randomGenerator.nextInt(6) == 0)
+								releasePoint = pts.get(1);
+							else
 							releasePoint = pts.get(0);
-						else 
-							if(pts.size() == 2)
-							{
-								// System.out.println("first shot " + this.Scene.firstShot);
-								// randomly choose between the trajectories, with a 1 in
-								// 6 chance of choosing the high one
-								if (randomGenerator.nextInt(6) == 0)
-									releasePoint = pts.get(1);
-								else
-								releasePoint = pts.get(0);
-							}
-							Point refPoint = tp.getReferencePoint(this.Scene.Sling);
-
-					// Get the release point from the trajectory prediction module
-					int tapTime = 0;
-					if (releasePoint != null) {
-						double releaseAngle = tp.getReleaseAngle(this.Scene.Sling,
-								releasePoint);
-						System.out.println("Release Point: " + releasePoint);
-						System.out.println("Release Angle: "
-								+ Math.toDegrees(releaseAngle));
-						int tapInterval = 0;
-						switch (this.Scene.BirdOnSling) 
-						{
-
-							case RedBird:
-								tapInterval = 0; break;               // start of trajectory
-							case YellowBird:
-								tapInterval = 65 + randomGenerator.nextInt(25);break; // 65-90% of the way
-							case WhiteBird:
-								tapInterval =  50 + randomGenerator.nextInt(20);break; // 50-70% of the way
-							case BlackBird:
-								tapInterval =  0;break; // 70-90% of the way
-							case BlueBird:
-								tapInterval =  65 + randomGenerator.nextInt(20);break; // 65-85% of the way
-							default:
-								tapInterval =  60;
 						}
-						
-						tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, _tpt, tapInterval);
-						
-					} else
-						{
-							System.err.println("No Release Point Found");
-							return ar.checkState();
-						}
-				
-				
-					// check whether the slingshot is changed. the change of the slingshot indicates a change in the scale.
-					ar.fullyZoomOut();
-					screenshot = ar.doScreenShot();
-					vision = new Vision(screenshot);
-					Rectangle _sling = vision.findSlingshotMBR();
-					if(_sling != null)
+						Point refPoint = tp.getReferencePoint(this.Scene.Sling);
+
+				// Get the release point from the trajectory prediction module
+				int tapTime = 0;
+				if (releasePoint != null) {
+					double releaseAngle = tp.getReleaseAngle(this.Scene.Sling,
+							releasePoint);
+					System.out.println("Release Point: " + releasePoint);
+					System.out.println("Release Angle: "
+							+ Math.toDegrees(releaseAngle));
+					int tapInterval = 0;
+					switch (this.Scene.BirdOnSling) 
 					{
-						double scale_diff = Math.pow((this.Scene.Sling.width - _sling.width),2) +  Math.pow((this.Scene.Sling.height - _sling.height),2);
-						if(scale_diff < 25)
+
+						case RedBird:
+							tapInterval = 0; break;               // start of trajectory
+						case YellowBird:
+							tapInterval = 65 + randomGenerator.nextInt(25);break; // 65-90% of the way
+						case WhiteBird:
+							tapInterval =  50 + randomGenerator.nextInt(20);break; // 50-70% of the way
+						case BlackBird:
+							tapInterval =  0;break; // 70-90% of the way
+						case BlueBird:
+							tapInterval =  65 + randomGenerator.nextInt(20);break; // 65-85% of the way
+						default:
+							tapInterval =  60;
+					}
+					
+					tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, _tpt, tapInterval);
+					
+				} else
+					{
+						System.err.println("No Release Point Found");
+						return ar.checkState();
+					}
+			
+			
+				// check whether the slingshot is changed. the change of the slingshot indicates a change in the scale.
+				ar.fullyZoomOut();
+				screenshot = ar.doScreenShot();
+				vision = new Vision(screenshot);
+				Rectangle _sling = vision.findSlingshotMBR();
+				if(_sling != null)
+				{
+					double scale_diff = Math.pow((this.Scene.Sling.width - _sling.width),2) +  Math.pow((this.Scene.Sling.height - _sling.height),2);
+					if(scale_diff < 25)
+					{
+						int dx = (int) releasePoint.getX() - refPoint.x;
+						int dy = (int) releasePoint.getY() - refPoint.y;
+						if(dx < 0)
 						{
-							int dx = (int) releasePoint.getX() - refPoint.x;
-							int dy = (int) releasePoint.getY() - refPoint.y;
-							if(dx < 0)
+							long timer = System.currentTimeMillis();
+							ar.shoot(refPoint.x, refPoint.y, dx, dy, 0, tapTime, false);
+							System.out.println("It takes " + (System.currentTimeMillis() - timer) + " ms to take a shot");
+							state = ar.checkState();
+							if ( state == GameState.PLAYING )
 							{
-								long timer = System.currentTimeMillis();
-								ar.shoot(refPoint.x, refPoint.y, dx, dy, 0, tapTime, false);
-								System.out.println("It takes " + (System.currentTimeMillis() - timer) + " ms to take a shot");
-								state = ar.checkState();
-								if ( state == GameState.PLAYING )
-								{
-									screenshot = ar.doScreenShot();
-									vision = new Vision(screenshot);
-									List<Point> traj = vision.findTrajPoints();
-									tp.adjustTrajectory(traj, this.Scene.Sling, releasePoint);
-									this.Scene.firstShot = false;
-								}
+								screenshot = ar.doScreenShot();
+								vision = new Vision(screenshot);
+								List<Point> traj = vision.findTrajPoints();
+								tp.adjustTrajectory(traj, this.Scene.Sling, releasePoint);
+								this.Scene.firstShot = false;
 							}
 						}
-						else
-							System.out.println("Scale is changed, can not execute the shot, will re-segement the image");
 					}
 					else
-						System.out.println("no sling detected, can not execute the shot, will re-segement the image");
+						System.out.println("Scale is changed, can not execute the shot, will re-segement the image");
+				}
+				else
+					System.out.println("no sling detected, can not execute the shot, will re-segement the image");
 				
 			}
 		}
