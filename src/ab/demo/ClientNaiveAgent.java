@@ -250,7 +250,6 @@ public class ClientNaiveAgent implements Runnable {
 				
 				
 				//ABObject pig = this.Scene.Pigs.get(randomGenerator.nextInt(this.Scene.Pigs.size()));
-				
 				/**********************************************/
 				/** TODO: IMPLEMENTAR INTELIGENCIA **/
 				/**********************************************/
