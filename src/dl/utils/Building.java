@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import dl.heuristics.SceneState;
 import ab.vision.*;
 import ab.vision.real.shape.Rect;
 import ab.demo.other.ClientActionRobot;
@@ -980,21 +981,30 @@ public class Building
 	 * @param Piggies
 	 * @return Lista de construcciones que fueron detectadas.
 	 */
-	public static List<Building> FindBuildings (List<ABObject> objs, List<ABObject>Piggies)
+//	public static List<Building> FindBuildings (List<ABObject> objs, List<ABObject>Piggies)
+	public static List<Building> FindBuildings (SceneState Scene)
     {
-        List<Building> result = FindBuildings(objs);
+		System.out.println("Entrando a Building.FindBuildings");
+        List<Building> result = FindBuildings(Scene.Blocks);
         
         for (int i = 0; i < result.size(); i++) {
         	Rectangle buildingBoundary = result.get(i).bounding;
         	if(buildingBoundary == null)
         		buildingBoundary = result.get(i).getBoundingRect();        		       		
         	boolean havePig = false;
-        	for (int j = 0; j < Piggies.size(); j++) {
-        		if (Piggies.get(j).x >= buildingBoundary.x && Piggies.get(j).x <= buildingBoundary.x + buildingBoundary.width &&
-        			   Piggies.get(j).y >= buildingBoundary.y && Piggies.get(j).y <= buildingBoundary.y + buildingBoundary.height ) {
+        	for (int j = 0; j < Scene.Pigs.size(); j++) {
+        		if (Scene.Pigs.get(j).x >= buildingBoundary.x && Scene.Pigs.get(j).x <= buildingBoundary.x + buildingBoundary.width &&
+        				Scene.Pigs.get(j).y >= buildingBoundary.y && Scene.Pigs.get(j).y <= buildingBoundary.y + buildingBoundary.height ) {
         			havePig = true;
-        			break;
+        			// Actualizo el SceneState con los chanchos que estan dentro de una construccion.
+        			Scene.PigsInBuildings.add(Scene.Pigs.get(j));
+        			System.out.println("Agregando chancho en una construccion");
 				}
+        		else{
+        			// Actualizo el SceneState con los chanchos que estan libres.
+        			Scene.FreePigs.add(Scene.Pigs.get(j));
+        			System.out.println("Agregando chanchos libres.");
+        		}
         	}
         	
         	if(!havePig){
@@ -1003,6 +1013,7 @@ public class Building
         	}
 		}
         System.out.println("\nSe han encontrado " + result.size() + " Consrucciones con chanchos dentro.\n");
+        System.out.println("Saliendo de Building.FindBuildings");
         return result;
     }
 	

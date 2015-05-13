@@ -28,6 +28,10 @@ public class SceneState
 
     public List<ABObject> Pigs;
     
+    public List<ABObject> FreePigs;
+    
+    public List<ABObject> PigsInBuildings;
+    
     public List<ABObject> Hills;
     
     public List<ABObject> Blocks;
@@ -71,6 +75,8 @@ public class SceneState
         BirdOnSling = ABType.Unknown;
 
         Pigs = new LinkedList<ABObject>();
+        FreePigs = new LinkedList<ABObject>();
+        PigsInBuildings = new LinkedList<ABObject>();
         Hills = new LinkedList<ABObject>();
         Blocks = new LinkedList<ABObject>();
         Sling = null;

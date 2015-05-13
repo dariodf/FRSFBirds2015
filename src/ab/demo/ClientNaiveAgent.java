@@ -100,7 +100,7 @@ public class ClientNaiveAgent implements Runnable {
 		
 		int[] scores = ar.checkMyScore();
 		System.out.println(" My score: ");
-		int level = 1;
+		int level = 1;	
 		for(int i: scores)
 		{
 			System.out.println(" level " + level + "  " + i);
@@ -232,7 +232,7 @@ public class ClientNaiveAgent implements Runnable {
 //		this.Scene.TNTs = vision.findTNTs(); // TNTs
 		this.Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
 //		this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks); // Construcciones
-		this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks, this.Scene.Pigs); // Construcciones con chanchos
+		this.Scene.Buildings = Building.FindBuildings(this.Scene); // Construcciones con chanchos
 		
  		
  		for (ABObject block : this.Scene.Blocks) {
@@ -253,14 +253,26 @@ public class ClientNaiveAgent implements Runnable {
 				/**********************************************/
 				/** TODO: IMPLEMENTAR INTELIGENCIA **/
 				/**********************************************/
-				ABObject pig = this.Scene.Pigs.get(0);
+				ABObject pig = new ABObject();
 				
+		//		if(this.Scene.Pigs.size() > 0){
+					if(!this.Scene.FreePigs.isEmpty()){
+						pig = this.Scene.FreePigs.get(0);
+						System.out.println("Chanchos Libres: " + this.Scene.FreePigs.size());
+					}
+					else if(!this.Scene.PigsInBuildings.isEmpty()){
+						pig = this.Scene.PigsInBuildings.get(0);
+						System.out.println("Chanchos en constructions: " + this.Scene.PigsInBuildings.size());
+					} else {
+						System.out.println("$$$$$$$$$$$$");
+					}
+		 
+				/*
 				System.out.println();
 				System.out.println("Seleccionado Chancho[" + this.Scene.Pigs.indexOf(pig) + "] en la pos: ( " + pig.x + ", " + pig.y + " )");
 				System.out.println();
-				
+				*/
 				Point _tpt = pig.getCenter();
-
 				
 				// if the target is very close to before, randomly choose a
 				// point near it

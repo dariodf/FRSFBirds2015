@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="Create Runnable Jar for Project AB1.0 with Jar-in-Jar Loader" > <!--default="create_run_jar"-->
+<project name="Create Runnable Jar for Project AB1.0 with Jar-in-Jar Loader" default="create_run_jar">
     <!--ANT 1.7 is required                                        -->
- 	<property name="lib.dir"     value="external"/>
-
+ 	<property name="lib.dir" value="external"/>
+	<property name="build.complie" value="org.eclipse.jdt.core.JDTComplierAdapter" />
     <path id="classpath">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
     </path>    
@@ -12,9 +12,13 @@
     <target name="compile">
         <mkdir dir="src"/>
 		<javac srcdir="src" destdir="src" classpathref="classpath"/>
-    </target>  
+    </target>
+    <target name="create_run_jar">
+        <mkdir dir="src"/>
+		<javac srcdir="src" destdir="src" classpathref="classpath"/>
+    </target>	
 	 <target name="jar">
-        <jar destfile="ABSoftware.jar">
+        <jar destfile="FRSFBirds2015.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="ab.demo.MainEntry"/>
