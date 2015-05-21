@@ -999,8 +999,7 @@ public class Building
         			// Actualizo el SceneState con los chanchos que estan dentro de una construccion.
         			Scene.PigsInBuildings.add(Scene.Pigs.get(j));
         			System.out.println("Agregando chancho en una construccion");
-				}
-        		else{
+				} else {
         			// Actualizo el SceneState con los chanchos que estan libres.
         			Scene.FreePigs.add(Scene.Pigs.get(j));
         			System.out.println("Agregando chanchos libres.");
@@ -1012,7 +1011,7 @@ public class Building
         		i--;
         	}
 		}
-        System.out.println("\nSe han encontrado " + result.size() + " Consrucciones con chanchos dentro.\n");
+        System.out.println("\nSe han encontrado " + Scene.PigsInBuildings.size() + " Consrucciones con chanchos dentro.\n");
         System.out.println("Saliendo de Building.FindBuildings");
         return result;
     }

@@ -122,8 +122,10 @@ public class ClientNaiveAgent implements Runnable {
 		//ar.loadLevel((byte)9);
 		GameState state;
 		while (true) {
-			
+			System.out.println("********START SOLVE***************");
 			state = solve();
+			System.out.println("**********END SOLVE***************");
+			System.out.println();
 			//If the level is solved , go to the next level
 			if (state == GameState.WON) {
 							
@@ -193,7 +195,6 @@ public class ClientNaiveAgent implements Runnable {
 	   * @return GameState: the game state after shots.
      */
 	public GameState solve()
-
 	{
 
 		// capture Image
@@ -227,17 +228,17 @@ public class ClientNaiveAgent implements Runnable {
 		///
 		this.Scene.Pigs = vision.findPigsRealShape();
 		this.Scene.Blocks = vision.findBlocksRealShape();
-// 		this.Scene.Birds = vision.findBirdsRealShape(); // Birds
-// 		this.Scene.Hills = vision.findHills(); // Hills
-//		this.Scene.TNTs = vision.findTNTs(); // TNTs
+        //this.Scene.Birds = vision.findBirdsRealShape(); // Birds
+		//this.Scene.Hills = vision.findHills(); // Hills
+		//this.Scene.TNTs = vision.findTNTs(); // TNTs
 		this.Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
-//		this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks); // Construcciones
+		//this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks); // Construcciones
 		this.Scene.Buildings = Building.FindBuildings(this.Scene); // Construcciones con chanchos
 		
  		
- 		for (ABObject block : this.Scene.Blocks) {
+ 		/*for (ABObject block : this.Scene.Blocks) {
  			 System.out.println(block.toString());
- 		}
+ 		}*/
  		
 		GameState state = ar.checkState();
 		// if there is a sling, then play, otherwise skip.
@@ -247,31 +248,28 @@ public class ClientNaiveAgent implements Runnable {
 			if (!this.Scene.Pigs.isEmpty()) {		
 				Point releasePoint = null;
 				// random pick up a pig
-				
-				
+								
 				//ABObject pig = this.Scene.Pigs.get(randomGenerator.nextInt(this.Scene.Pigs.size()));
 				/**********************************************/
 				/** TODO: IMPLEMENTAR INTELIGENCIA **/
 				/**********************************************/
 				ABObject pig = new ABObject();
 				
-		//		if(this.Scene.Pigs.size() > 0){
-					if(!this.Scene.FreePigs.isEmpty()){
-						pig = this.Scene.FreePigs.get(0);
-						System.out.println("Chanchos Libres: " + this.Scene.FreePigs.size());
-					}
-					else if(!this.Scene.PigsInBuildings.isEmpty()){
-						pig = this.Scene.PigsInBuildings.get(0);
-						System.out.println("Chanchos en constructions: " + this.Scene.PigsInBuildings.size());
-					} else {
-						System.out.println("$$$$$$$$$$$$");
-					}
-		 
-				/*
+				if(!this.Scene.FreePigs.isEmpty()){
+					pig = this.Scene.FreePigs.get(0);
+					System.out.println("Chanchos Libres: " + this.Scene.FreePigs.size());
+				}
+				else if(!this.Scene.PigsInBuildings.isEmpty()){
+					pig = this.Scene.PigsInBuildings.get(0);
+					System.out.println("Chanchos en constructions: " + this.Scene.PigsInBuildings.size());
+				} else {
+					System.out.println("$$$$$$$$$$$$");
+				}
+				
 				System.out.println();
 				System.out.println("Seleccionado Chancho[" + this.Scene.Pigs.indexOf(pig) + "] en la pos: ( " + pig.x + ", " + pig.y + " )");
 				System.out.println();
-				*/
+				
 				Point _tpt = pig.getCenter();
 				
 				// if the target is very close to before, randomly choose a

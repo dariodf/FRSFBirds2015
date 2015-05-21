@@ -36,7 +36,6 @@ public class MainEntry {
 					{
 						ShootingAgent.shoot(args, false);
 					}
-
 					else	
 						if (args.length == 1 && command.equalsIgnoreCase("-nasc"))
 						{
