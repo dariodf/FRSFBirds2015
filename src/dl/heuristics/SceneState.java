@@ -35,6 +35,7 @@ public class SceneState
     public List<ABObject> Hills;
     
     public List<ABObject> Blocks;
+    public List<ABObject> CircularBlocks;
     
     public List<Building> Buildings;
     
@@ -84,5 +85,39 @@ public class SceneState
 
         prevTarget = null;
         firstShot = true;
+        
+        this.Buildings = new LinkedList<Building>();
+        this.CircularBlocks = new LinkedList<ABObject>();
     }
+    
+    @Override public String toString() {
+    	String result = "---------Chanchos---------\n";
+    	result += " # Total: " + this.Pigs.size() + ".\n";
+        result += " # En Construcción: " + this.PigsInBuildings.size() + ".\n";
+        result += " # Chanchos Libres: " + this.FreePigs.size() + ".\n";
+        
+        result += "---------Bloques---------\n";
+        result += " # Total: " + this.Blocks.size() + ".\n";
+        result += " # Circulares: " + this.CircularBlocks.size() + ".\n";
+        
+        result += "---------Construcciones---------\n";
+        
+        result += " # Total: " + this.Buildings.size() + ". (2 o más bloques)\n";
+        
+        result += "---------Pájaros---------\n";
+        
+        result += " # Total: " + this.Birds.size() + ".\n";
+        result += " # En la resortera: " + this.BirdOnSling.toString() + ".\n"; 
+        
+        result += "---------Colinas---------\n";
+        
+        result += " # Total: " + this.Hills.size() + ".\n";
+        
+        result += "---------TNTs---------\n";
+        
+        result += " # Total: " + this.TNTs.size() + ".\n";
+        
+    	return result;
+    }
+    
 }

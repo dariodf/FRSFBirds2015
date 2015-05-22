@@ -23,6 +23,7 @@ import ab.demo.other.ClientActionRobot;
 import ab.demo.other.ClientActionRobotJava;
 import ab.planner.TrajectoryPlanner;
 import ab.vision.ABObject;
+import ab.vision.ABShape;
 import ab.vision.GameStateExtractor.GameState;
 import ab.vision.Vision;
 //Naive agent (server/client version)
@@ -32,7 +33,7 @@ public class ClientNaiveAgent implements Runnable {
 
 	//Wrapper of the communicating messages
 	private ClientActionRobotJava ar;
-	public byte currentLevel = -1;
+	public byte currentLevel = 14;//-1; // TODO: 
 	public int failedCounter = 0;
 	public int[] solved;
 	TrajectoryPlanner tp; 
@@ -122,9 +123,9 @@ public class ClientNaiveAgent implements Runnable {
 		//ar.loadLevel((byte)9);
 		GameState state;
 		while (true) {
-			System.out.println("********START SOLVE***************");
+			
 			state = solve();
-			System.out.println("**********END SOLVE***************");
+			
 			System.out.println();
 			//If the level is solved , go to the next level
 			if (state == GameState.WON) {
@@ -203,7 +204,7 @@ public class ClientNaiveAgent implements Runnable {
 		// process image
 		Vision vision = new Vision(screenshot);
 		
-		this.Scene.Sling = vision.findSlingshotMBR();
+		this.percibirElementosDeLaEscena(vision);
 		
 
 		//If the level is loaded (in PLAYING　state)but no slingshot detected, then the agent will request to fully zoom out.
@@ -223,17 +224,7 @@ public class ClientNaiveAgent implements Runnable {
 		}
 
 		
- 		/// TODO: Si se necesitan los otros objetos en la pantalla Descomentar las lineas necesarias.
- 		/// ( ^___^)b d(^___^ )
-		///
-		this.Scene.Pigs = vision.findPigsRealShape();
-		this.Scene.Blocks = vision.findBlocksRealShape();
-        //this.Scene.Birds = vision.findBirdsRealShape(); // Birds
-		//this.Scene.Hills = vision.findHills(); // Hills
-		//this.Scene.TNTs = vision.findTNTs(); // TNTs
-		this.Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
-		//this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks); // Construcciones
-		this.Scene.Buildings = Building.FindBuildings(this.Scene); // Construcciones con chanchos
+		
 		
  		
  		/*for (ABObject block : this.Scene.Blocks) {
@@ -254,17 +245,15 @@ public class ClientNaiveAgent implements Runnable {
 				/** TODO: IMPLEMENTAR INTELIGENCIA **/
 				/**********************************************/
 				ABObject pig = new ABObject();
-				
-				if(!this.Scene.FreePigs.isEmpty()){
+				if(!this.Scene.CircularBlocks.isEmpty())
+					pig = this.Scene.CircularBlocks.get(0);
+				else if(!this.Scene.FreePigs.isEmpty())
 					pig = this.Scene.FreePigs.get(0);
-					System.out.println("Chanchos Libres: " + this.Scene.FreePigs.size());
-				}
-				else if(!this.Scene.PigsInBuildings.isEmpty()){
+				else if(!this.Scene.PigsInBuildings.isEmpty())
 					pig = this.Scene.PigsInBuildings.get(0);
-					System.out.println("Chanchos en constructions: " + this.Scene.PigsInBuildings.size());
-				} else {
+				else 
 					System.out.println("$$$$$$$$$$$$");
-				}
+				
 				
 				System.out.println();
 				System.out.println("Seleccionado Chancho[" + this.Scene.Pigs.indexOf(pig) + "] en la pos: ( " + pig.x + ", " + pig.y + " )");
@@ -377,6 +366,41 @@ public class ClientNaiveAgent implements Runnable {
 			}
 		}
 		return state;
+	}
+	/**
+	 * Obtiene todos los elementos que posee la pantalla actual, y lo guarda en Scene.
+	 * @param vision
+	 */
+	private void percibirElementosDeLaEscena(Vision vision) {
+		/// TODO: Si se necesitan los otros objetos en la pantalla Descomentar las lineas necesarias.
+ 		/// ( ^___^)b d(^___^ )
+		///
+		this.Scene.Sling = vision.findSlingshotMBR(); // Sling
+		
+		List<ABObject> temp = vision.findPigsRealShape() ;
+		this.Scene.Pigs = (temp != null) ? temp : new LinkedList<ABObject>(); // Pigs
+		temp = vision.findBlocksRealShape();
+		this.Scene.Blocks = (temp != null) ? temp : new LinkedList<ABObject>(); // Blocks
+		temp = vision.findBirdsRealShape(); // Birds
+        this.Scene.Birds = (temp != null) ? temp : new LinkedList<ABObject>();
+        temp = vision.findHills();
+		this.Scene.Hills = (temp != null) ? temp : new LinkedList<ABObject>(); // Hills
+		temp = vision.findTNTs();
+		this.Scene.TNTs = (temp != null) ? temp : new LinkedList<ABObject>(); // TNTs
+		this.Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
+		//this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks); // Construcciones
+		this.Scene.Buildings = Building.FindBuildings(this.Scene); // Construcciones con chanchos
+		
+		// TODO: Ver en que clase agregar esto....
+		this.Scene.CircularBlocks.clear();
+		for (ABObject b : this.Scene.Blocks) {
+			if (b.shape == ABShape.Circle) {
+				this.Scene.CircularBlocks.add(b);
+			}
+		}
+		
+		
+		System.out.println(this.Scene.toString());
 	}
 
 	private double distance(Point p1, Point p2) {

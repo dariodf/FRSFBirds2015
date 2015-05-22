@@ -937,6 +937,7 @@ public class Building
         	Building b = FindBuilding(tobevisited);
         	if(b.blocks.size() > 1)
         		boundingboxes.add(b);
+ 
         }
         System.out.println("\nSe han encontrado " + boundingboxes.size() + " Consrucciones.\n");
         return boundingboxes;
@@ -960,20 +961,29 @@ public class Building
         {
             ABObject tmp = fronta.poll();
             total.add(tmp);
+                        	
+            	for (int i=0;i<blocks.size();++i)
+            	{
+            		if (tmp.touches(blocks.get(i)) && (blocks.get(i).type == ABType.Hill) )
+            		{
+            			total.add(blocks.get(i));
+            			blocks.remove(i);  
+            			--i;
+            		}
+            		else if (tmp.touches(blocks.get(i) ) )
+            		{
+            			fronta.add(blocks.get(i));
+            			blocks.remove(i);  
+            			--i;
+            		}
+            	}
             
-            for (int i=0;i<blocks.size();++i)
-            {
-                if (tmp.touches(blocks.get(i) ) )
-                {
-                    fronta.add(blocks.get(i));
-                    blocks.remove(i);  
-                    --i;
-                }
-            }
         }
         Building bld = new Building(total);
         return bld;
 	}
+	
+	
 	
 	/**
 	 * Dado una lista de bloques y la lista de chanchos, se busca si existen construcciones que contengan chanchos.
@@ -981,11 +991,16 @@ public class Building
 	 * @param Piggies
 	 * @return Lista de construcciones que fueron detectadas.
 	 */
-//	public static List<Building> FindBuildings (List<ABObject> objs, List<ABObject>Piggies)
 	public static List<Building> FindBuildings (SceneState Scene)
     {
-		System.out.println("Entrando a Building.FindBuildings");
-        List<Building> result = FindBuildings(Scene.Blocks);
+		List<ABObject> bloques = new LinkedList<ABObject>();
+		bloques.addAll(Scene.Blocks);
+		bloques.addAll(Scene.Hills);
+		
+        List<Building> result = FindBuildings(bloques);
+        
+        Scene.FreePigs = new LinkedList<ABObject>();
+        Scene.PigsInBuildings = new LinkedList<ABObject>();
         
         for (int i = 0; i < result.size(); i++) {
         	Rectangle buildingBoundary = result.get(i).bounding;
@@ -998,12 +1013,7 @@ public class Building
         			havePig = true;
         			// Actualizo el SceneState con los chanchos que estan dentro de una construccion.
         			Scene.PigsInBuildings.add(Scene.Pigs.get(j));
-        			System.out.println("Agregando chancho en una construccion");
-				} else {
-        			// Actualizo el SceneState con los chanchos que estan libres.
-        			Scene.FreePigs.add(Scene.Pigs.get(j));
-        			System.out.println("Agregando chanchos libres.");
-        		}
+				} 
         	}
         	
         	if(!havePig){
@@ -1011,8 +1021,13 @@ public class Building
         		i--;
         	}
 		}
-        System.out.println("\nSe han encontrado " + Scene.PigsInBuildings.size() + " Consrucciones con chanchos dentro.\n");
-        System.out.println("Saliendo de Building.FindBuildings");
+        
+        for (ABObject p : Scene.Pigs) {
+			if (!Scene.PigsInBuildings.contains(p)) {
+				Scene.FreePigs.add(p);
+			}
+		}
+        
         return result;
     }
 	
