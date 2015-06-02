@@ -17,8 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import dl.heuristics.SceneState;
-import dl.utils.Building;
+import tori.heuristics.SceneState;
+import tori.utils.Building;
 import ab.demo.other.ClientActionRobot;
 import ab.demo.other.ClientActionRobotJava;
 import ab.planner.TrajectoryPlanner;
@@ -33,7 +33,7 @@ public class ClientNaiveAgent implements Runnable {
 
 	//Wrapper of the communicating messages
 	private ClientActionRobotJava ar;
-	public byte currentLevel = 14;//-1; // TODO: 
+	public byte currentLevel = 7;//-1; // TODO: 
 	public int failedCounter = 0;
 	public int[] solved;
 	TrajectoryPlanner tp; 
@@ -259,6 +259,7 @@ public class ClientNaiveAgent implements Runnable {
 				System.out.println("Seleccionado Chancho[" + this.Scene.Pigs.indexOf(pig) + "] en la pos: ( " + pig.x + ", " + pig.y + " )");
 				System.out.println();
 				
+				//TODO SELECION DE PUNTO A DONDE DISPARA
 				Point _tpt = pig.getCenter();
 				
 				// if the target is very close to before, randomly choose a
@@ -290,9 +291,9 @@ public class ClientNaiveAgent implements Runnable {
 							if (randomGenerator.nextInt(6) == 0)
 								releasePoint = pts.get(1);
 							else
-							releasePoint = pts.get(0);
+								releasePoint = pts.get(0);
 						}
-						Point refPoint = tp.getReferencePoint(this.Scene.Sling);
+				Point refPoint = tp.getReferencePoint(this.Scene.Sling);
 
 				// Get the release point from the trajectory prediction module
 				int tapTime = 0;
@@ -390,7 +391,7 @@ public class ClientNaiveAgent implements Runnable {
 		this.Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
 		//this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks); // Construcciones
 		this.Scene.Buildings = Building.FindBuildings(this.Scene); // Construcciones con chanchos
-		
+
 		// TODO: Ver en que clase agregar esto....
 		this.Scene.CircularBlocks.clear();
 		for (ABObject b : this.Scene.Blocks) {
@@ -398,6 +399,13 @@ public class ClientNaiveAgent implements Runnable {
 				this.Scene.CircularBlocks.add(b);
 			}
 		}
+		
+		//TODO: Testing
+		String s = "";
+		for (ABObject p : this.Scene.Pigs) {
+			s += String.format("Chancho: %d, %d \tAtrapado: %s\n", p.x, p.y, p.isSomethingBigAbove(this.Scene.Blocks));
+		}
+		System.out.println(s);
 		
 		
 		System.out.println(this.Scene.toString());

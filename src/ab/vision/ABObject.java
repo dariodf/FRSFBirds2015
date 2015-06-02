@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import dl.utils.ABObjectComp;
+import tori.utils.ABObjectComp;
 
 public class ABObject extends Rectangle 
 {

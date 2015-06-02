@@ -16,6 +16,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import ab.vision.ABObject;
+
 /* TrajectoryPlanner ------------------------------------------------------ */
 
 
@@ -473,6 +475,59 @@ public class TrajectoryPlanner {
 		double r = ((double)tapInterval/100);
 		tapPoint.setLocation(new Point((int)(distance * r + sling.x) , target.y));
 		return getTimeByDistance(sling, release, tapPoint);
+		
+	}
+	
+	public boolean trajectoriaObstruida(Rectangle sling, ArrayList<Point> release, Point target, ABObject object){
+	
+		double x1, y1;
+		double x2, y2;
+		double x3, y3;
+		double denom;
+		double A, B ,C;
+		
+		double y, yWidth, offset;
+		
+		//Punto de la resoltera
+		x2 = this.getReferencePoint(sling).x;
+		y2 = this.getReferencePoint(sling).y;
+		
+		//Punto del Objectivo
+		x3 = target.x;
+		y3 = target.y;
+		
+		for (Point p : release) {
+			// Punto de lanzamiento
+			x1 = p.x;
+			y1 = p.y;
+
+			denom = (x1 - x2) * (x1 - x3) * (x2 - x3);
+			A = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denom;
+			B = (x3 * x3 * (y1 - y2) + x2 * x2 * (y3 - y1) + x1 * x1
+					* (y2 - y3))
+					/ denom;
+			C = (x2 * x3 * (x2 - x3) * y1 + x3 * x1 * (x3 - x1) * y2 + x1 * x2
+					* (x1 - x2) * y3)
+					/ denom;
+
+			offset = 5;
+			y = mathTrayectory(A, B, C, object.x) + offset;
+			yWidth = mathTrayectory(A, B, C, object.x + object.width) + offset;
+
+			if ((y <= object.y) || (yWidth <= object.y))
+				return true;		
+			
+		}
+		
+		return false;
+		
+	}
+	
+	
+	
+	private double mathTrayectory(double a, double b, double c, double x){
+		
+		return a*x*x + b*x + c;
 		
 	}
     
