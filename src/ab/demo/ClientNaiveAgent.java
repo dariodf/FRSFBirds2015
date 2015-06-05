@@ -198,6 +198,8 @@ public class ClientNaiveAgent implements Runnable {
 	public GameState solve()
 	{
 
+		boolean highShoot = false;
+		
 		// capture Image
 		BufferedImage screenshot = ar.doScreenShot();
 
@@ -245,14 +247,20 @@ public class ClientNaiveAgent implements Runnable {
 				/** TODO: IMPLEMENTAR INTELIGENCIA **/
 				/**********************************************/
 				ABObject pig = new ABObject();
-				if(!this.Scene.CircularBlocks.isEmpty())
+				/*if(!this.Scene.CircularBlocks.isEmpty())
 					pig = this.Scene.CircularBlocks.get(0);
-				else if(!this.Scene.FreePigs.isEmpty())
+				else */
+				
+				if(!this.Scene.FreePigs.isEmpty())
 					pig = this.Scene.FreePigs.get(0);
+				else if(!this.Scene.ObstructedPigs.isEmpty()){
+					pig = this.Scene.ObstructedPigs.get(0);
+					highShoot = true;
+				}
 				else if(!this.Scene.PigsInBuildings.isEmpty())
 					pig = this.Scene.PigsInBuildings.get(0);
 				else 
-					System.out.println("$$$$$$$$$$$$");
+					System.out.println("NO ENCONTRO OBJETO PARA DISPARA");
 				
 				
 				System.out.println();
@@ -277,15 +285,15 @@ public class ClientNaiveAgent implements Runnable {
 				ArrayList<Point> pts = tp.estimateLaunchPoint(this.Scene.Sling, _tpt);
 
 				// do a high shot when entering a level to find an accurate velocity
+				/*
 				if (this.Scene.firstShot && pts.size() > 1) {
 					releasePoint = pts.get(1);
 				} else 
 					if (pts.size() == 1)
 						releasePoint = pts.get(0);
 					else 
-						if(pts.size() == 2)
-						{
-							// System.out.println("first shot " + this.Scene.firstShot);
+						if(pts.size() == 2)	{
+							System.out.println("first shot " + this.Scene.firstShot);
 							// randomly choose between the trajectories, with a 1 in
 							// 6 chance of choosing the high one
 							if (randomGenerator.nextInt(6) == 0)
@@ -293,6 +301,14 @@ public class ClientNaiveAgent implements Runnable {
 							else
 								releasePoint = pts.get(0);
 						}
+				*/
+
+				//Este if es para si en hay un chancho obstruido hace el trio alto
+				if (highShoot)
+					releasePoint = pts.get(1); //pts.get(1) -> tiro alto
+				else
+					releasePoint = pts.get(0); //pts.get(1) -> tiro bajo
+				
 				Point refPoint = tp.getReferencePoint(this.Scene.Sling);
 
 				// Get the release point from the trajectory prediction module
@@ -304,6 +320,9 @@ public class ClientNaiveAgent implements Runnable {
 					System.out.println("Release Angle: "
 							+ Math.toDegrees(releaseAngle));
 					int tapInterval = 0;
+					
+					//taptime = this.Scene.Birds.get(0).secondShott();
+					/*
 					switch (this.Scene.BirdOnSling) 
 					{
 
@@ -320,7 +339,7 @@ public class ClientNaiveAgent implements Runnable {
 						default:
 							tapInterval =  60;
 					}
-					
+					*/
 					tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, _tpt, tapInterval);
 					
 				} else

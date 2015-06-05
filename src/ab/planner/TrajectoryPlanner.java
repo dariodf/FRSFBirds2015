@@ -466,6 +466,7 @@ public class TrajectoryPlanner {
         }      
         return activeBird;
     }  
+    
 	public int getTapTime(Rectangle sling, Point release, Point target, int tapInterval)
 	{
 		if (tapInterval == 0)
@@ -474,6 +475,13 @@ public class TrajectoryPlanner {
 		int distance = target.x - sling.x;
 		double r = ((double)tapInterval/100);
 		tapPoint.setLocation(new Point((int)(distance * r + sling.x) , target.y));
+		
+		
+		
+		
+		
+		
+		
 		return getTimeByDistance(sling, release, tapPoint);
 		
 	}
