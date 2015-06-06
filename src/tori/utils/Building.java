@@ -45,83 +45,18 @@ public class Building
     public List<Integer> distances = new LinkedList<Integer>();
 
     private Rectangle bounding;
-    private  int [] offsets = {1,2,4,6};
-    private int [] types = null;
+    public Types type;
 
     public static final int PIG_VALUE = 5000;
 
-    public static final double pyramidUtility[][] = 
-    {
-		{0, 0.5},
-		{0.05, 0.6},
-		{0.1, 0.6},
-		{0.2, 0.6},
-		{0.3, 0.60},
-		{0.4, 0.65},
-		{0.5, 0.7},
-		{0.6, 0.75},
-		{0.7, 0.8},
-		{0.8, 0.9},
-		{0.9, .95},
-		{1, 0.5}
-	};
-
-	public static final double rectangleUtility[][] = {
-		{0, 0.8},
-		{0.05, 1},
-		{0.1, 0.9},
-		{0.2, 0.8},
-		{0.3, 0.7},
-		{0.4, 0.6},
-		{0.5, 0.5},
-		{0.6, 0.6},
-		{0.7, 0.7},
-		{0.8, 0.9},
-		{0.9, 0.9},
-		{1, 0.5}
-	};
-
-	public static final double highUtility[][] =  {
-		{0, 0.6},
-		{0.05, 0.95},
-		{0.1, 0.9},
-		{0.2, 0.85},
-		{0.3, 0.8},
-		{0.4, 0.75},
-		{0.5, 0.7},
-		{0.6, 0.6},
-		{0.7, 0.75},
-		{0.8, 0.8},
-		{0.9, 0.85},
-		{1, 0.5}
-  	};
-
-  	public static final int destroyUtility[][] = {
-  		// ICE
-    		  // WOOD
-              	  // STONE
-		{1000,1400, 500}, // RED_BIRD
-		{ 700,1000, 300}, // YELLOW_BIRD
-		{ 550, 200, 100}, // BLUE_BIRD
-		{1100,1000, 700}, // BLACK_BIRD
-		{   0,   0,   0}  // WHITE_BIRD
-  	};
-
-  	public static final int getDownUtility[][] = {  		
-		{ 900,1500, 850}, // RED_BIRD
-		{ 300, 750,1050}, // YELLOW_BIRD
-		{ 100, 500, 300}, // BLUE_BIRD
-		{ 500, 700, 900}, // BLACK_BIRD
-		{   0,   0,   0}  // WHITE_BIRD
-  	};
-
-  	public static final double blocksInTheWayUtility[][] = {
-  		{  .9, .8, .7}, // RED_BIRD
-		{  .95,  .9, .8}, // YELLOW_BIRD
-		{  .95, .8, .6}, // BLUE_BIRD
-		{  .8, .85, .7}, // BLACK_BIRD
-		{   0,   0,   0}  // WHITE_BIRD
-  	};
+    public enum Types{
+    	Nothing,
+    	HouseOfCards,
+    	Bunker,
+    	Tower,
+    	DeathStar
+    }
+    
 
   	/**
 	*	Basic constructor for the building.
@@ -135,6 +70,7 @@ public class Building
 		y = left.y;	
 		height = findHeight();
 		bounding = null;
+		this.type = this.FindBuildingType();
 	}
 
 	/**
@@ -714,24 +650,24 @@ public class Building
 	/**
 	*	@return an array representing different blocks that are contained in the building.
 	*/
-	public int [] getTypes()
-	{
-		if (types != null)
-			return types;
-		
-		final int total = ABType.values().length;
-		types = new int[total];
-		
-		for (int i = 0; i < total;++i)
-		{
-			types[i] = 0;
-		}
-
-		for (ABObject obj : blocks){
-			types[obj.type.id]++;
-		}
-		return types;
-	}
+//	public int [] getTypes()
+//	{
+//		if (types != null)
+//			return types;
+//		
+//		final int total = ABType.values().length;
+//		types = new int[total];
+//		
+//		for (int i = 0; i < total;++i)
+//		{
+//			types[i] = 0;
+//		}
+//
+//		for (ABObject obj : blocks){
+//			types[obj.type.id]++;
+//		}
+//		return types;
+//	}
 	/**
 	*	@return true if the structure resembles pyramid, false otherwise
 	*/
@@ -775,22 +711,22 @@ public class Building
 	*	goes through the building and finds the dominant ABtype contained in the building and returns its id
 	*	@return the id of the dominant type
 	*/
-	public int getDominantType(){
-		getTypes();
-		int max = 0;
-		int index = 0;
-		
-		for (int i = 0; i<types.length;++i)
-		{
-			if (types[i] > max){
-				max = types[i];
-				index = i;
-			}
-				
-		}
-		
-		return index;
-	}
+//	public int getDominantType(){
+//		getTypes();
+//		int max = 0;
+//		int index = 0;
+//		
+//		for (int i = 0; i<types.length;++i)
+//		{
+//			if (types[i] > max){
+//				max = types[i];
+//				index = i;
+//			}
+//				
+//		}
+//		
+//		return index;
+//	}
 	
 	/**
 	*	@return distance to the nearest object below the target object
@@ -1037,17 +973,36 @@ public class Building
         Scene.FreePigs = new LinkedList<ABObject>();
         Scene.PigsInBuildings = new LinkedList<ABObject>();
         
+        
+        TrajectoryPlanner tp = new TrajectoryPlanner();
+        int obsPigs = 0, freePig = 0;
+        for (ABObject p : Scene.Pigs) {
+
+        	for(ABObject construccion : construciones)
+        		if(tp.trajectoriaObstruida(Scene.Sling, tp.estimateLaunchPoint(Scene.Sling, p.getCenter()), p.getCenter(), construccion)){
+        			Scene.ObstructedPigs.add(p);
+        			obsPigs++;
+        			break;
+        		} else {
+        			Scene.FreePigs.add(p);
+        			freePig++;
+        			break;
+        		}
+
+        }
+        
         for (int i = 0; i < result.size(); i++) {
         	Rectangle buildingBoundary = result.get(i).bounding;
         	if(buildingBoundary == null)
         		buildingBoundary = result.get(i).getBoundingRect();        		       		
         	boolean havePig = false;
-        	for (int j = 0; j < Scene.Pigs.size(); j++) {
-        		if (Scene.Pigs.get(j).x >= buildingBoundary.x && Scene.Pigs.get(j).x <= buildingBoundary.x + buildingBoundary.width &&
-        				Scene.Pigs.get(j).y >= buildingBoundary.y && Scene.Pigs.get(j).y <= buildingBoundary.y + buildingBoundary.height ) {
+        	for (int j = 0; j < Scene.ObstructedPigs.size(); j++) {
+        		if (Scene.ObstructedPigs.get(j).x >= buildingBoundary.x && Scene.ObstructedPigs.get(j).x <= buildingBoundary.x + buildingBoundary.width &&
+        				Scene.ObstructedPigs.get(j).y >= buildingBoundary.y && Scene.ObstructedPigs.get(j).y <= buildingBoundary.y + buildingBoundary.height ) {
         			havePig = true;
         			// Actualizo el SceneState con los chanchos que estan dentro de una construccion.
-        			Scene.PigsInBuildings.add(Scene.Pigs.get(j));
+        			Scene.PigsInBuildings.add(Scene.ObstructedPigs.get(j));
+        			Scene.ObstructedPigs.remove(j);
 				} 
         	}
         	
@@ -1057,26 +1012,18 @@ public class Building
         	}
 		}
         
-        TrajectoryPlanner tp = new TrajectoryPlanner();
-        int obsPigs = 0, freePig = 0;
-        for (ABObject p : Scene.Pigs) {
-			if (!Scene.PigsInBuildings.contains(p)) {
-				for(ABObject construccion : construciones)
-					if(tp.trajectoriaObstruida(Scene.Sling, tp.estimateLaunchPoint(Scene.Sling, p.getCenter()), p.getCenter(), construccion)){
-						Scene.ObstructedPigs.add(p);
-						obsPigs++;
-						break;
-					} else {
-						Scene.FreePigs.add(p);
-						freePig++;
-						break;
-					}
-			}
-		}
+        
         
         System.out.println(construciones.size() + " - " + obsPigs + " - " + freePig);
         
         return result;
     }
+	
+	public Types FindBuildingType(){
+		
+		// TODO: Termninar
+		return Types.Nothing;
+	}
+	
 	
 }
