@@ -121,7 +121,9 @@ public class SceneState
         result += "---------TNTs---------\n";
         
         result += " # Total: " + this.TNTs.size() + ".\n";
-        
+        Building bil =  new Building(objs);
+        Rectangle r =  new 	Rectangle();
+        r.
     	return result;
     }
     

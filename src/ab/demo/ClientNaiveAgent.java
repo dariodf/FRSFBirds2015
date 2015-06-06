@@ -321,11 +321,9 @@ public class ClientNaiveAgent implements Runnable {
 							+ Math.toDegrees(releaseAngle));
 					int tapInterval = 0;
 					
-					//taptime = this.Scene.Birds.get(0).secondShott();
 					/*
 					switch (this.Scene.BirdOnSling) 
 					{
-
 						case RedBird:
 							tapInterval = 0; break;               // start of trajectory
 						case YellowBird:
@@ -339,14 +337,16 @@ public class ClientNaiveAgent implements Runnable {
 						default:
 							tapInterval =  60;
 					}
-					*/
 					tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, _tpt, tapInterval);
+					*/
 					
-				} else
-					{
-						System.err.println("No Release Point Found");
-						return ar.checkState();
-					}
+					Point tapPoint = new Point(_tpt.x, _tpt.y);
+					tapTime = tp.getTapTimeFromPoint(this.Scene.Sling, releasePoint, _tpt, tapPoint);
+					
+				} else {
+					System.err.println("No Release Point Found");
+					return ar.checkState();
+				}
 			
 			
 				// check whether the slingshot is changed. the change of the slingshot indicates a change in the scale.

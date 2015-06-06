@@ -1,0 +1,4 @@
+*.class
+*.launch
+.settings/org.eclipse.jdt.core.prefs
+FRSFBirds2015.jar

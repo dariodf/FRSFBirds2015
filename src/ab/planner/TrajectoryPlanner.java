@@ -467,7 +467,8 @@ public class TrajectoryPlanner {
         return activeBird;
     }  
     
-	public int getTapTime(Rectangle sling, Point release, Point target, int tapInterval)
+  //Setea el tap de la habilidad especial, segun un porcentaje de la distancia entre el traget y la resoltera
+    public int getTapTime(Rectangle sling, Point release, Point target, int tapInterval)
 	{
 		if (tapInterval == 0)
 			return 0;
@@ -475,13 +476,13 @@ public class TrajectoryPlanner {
 		int distance = target.x - sling.x;
 		double r = ((double)tapInterval/100);
 		tapPoint.setLocation(new Point((int)(distance * r + sling.x) , target.y));
+				return getTimeByDistance(sling, release, tapPoint);
 		
-		
-		
-		
-		
-		
-		
+	}
+	
+	//Setea el tap de la habilidad especial, segun una coordenada especifica
+	public int getTapTimeFromPoint(Rectangle sling, Point release, Point target, Point tapPoint)
+	{
 		return getTimeByDistance(sling, release, tapPoint);
 		
 	}
