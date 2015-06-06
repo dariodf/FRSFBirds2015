@@ -2,3 +2,13 @@
 *.launch
 .settings/org.eclipse.jdt.core.prefs
 FRSFBirds2015.jar
+
+/bin/
+
+*.classpath
+*.classpath
+*.classpath
+*.jar
+*.class
+*.classpath
+.classpath
