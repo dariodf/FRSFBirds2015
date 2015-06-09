@@ -45,17 +45,10 @@ public class Building
     public List<Integer> distances = new LinkedList<Integer>();
 
     private Rectangle bounding;
-    public Types type;
+
 
     public static final int PIG_VALUE = 5000;
 
-    public enum Types{
-    	Nothing,
-    	HouseOfCards,
-    	Bunker,
-    	Tower,
-    	DeathStar
-    }
     
 
   	/**
@@ -70,7 +63,7 @@ public class Building
 		y = left.y;	
 		height = findHeight();
 		bounding = null;
-		this.type = this.FindBuildingType();
+		
 	}
 
 	/**
@@ -906,7 +899,8 @@ public class Building
                 }
             }
         }
-        Building bld = new Building(total);
+        Building bld =  ClasifyBuilding(total);
+//        Building bld = new Building(total);
         return bld;
 	}
 	
@@ -1007,22 +1001,29 @@ public class Building
         	}
         	
         	if(!havePig){
+        		Scene.FreeBuildings.add(result.get(i));
         		result.remove(i);
         		i--;
         	}
 		}
-        
-        
         
         System.out.println(construciones.size() + " - " + obsPigs + " - " + freePig);
         
         return result;
     }
 	
-	public Types FindBuildingType(){
+
+	public static Building ClasifyBuilding( List<ABObject> total){
+		Building result = new Building(total); 
 		
-		// TODO: Termninar
-		return Types.Nothing;
+		double angle = total.get(0).angle;
+		for(ABObject bloque : total){
+			if(bloque.angle == angle){
+				
+			}
+		}
+		
+		return result;
 	}
 	
 	

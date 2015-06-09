@@ -42,6 +42,8 @@ public class SceneState
     
     public List<Building> Buildings;
     
+    public List<Building> FreeBuildings;
+    
     public Rectangle Sling;
 
     public List<ABObject> TNTs; 
