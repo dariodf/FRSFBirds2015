@@ -260,7 +260,7 @@ public class ABObject extends Rectangle
 	}
 	/**	
 *			       |-OBJ-----------|
-*	 |Directlyleft||-OBJ-----------|
+*	| Directlyleft||-OBJ-----------|
 *	|isLeftTouches||-OBJ-----------|
 *		          	|support|
 *		|left|         |directlybelow|
@@ -286,6 +286,8 @@ public class ABObject extends Rectangle
 		
 		return true;
 	}
+	
+	
 	/**
 	* along the lines of isDirectlyLeft
 	*/
@@ -756,5 +758,9 @@ public class ABObject extends Rectangle
     	else
     		return false;
     } 
+    
+    
+    
+    
     
 }

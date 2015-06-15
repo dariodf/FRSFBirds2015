@@ -33,7 +33,7 @@ public class ClientNaiveAgent implements Runnable {
 
 	//Wrapper of the communicating messages
 	private ClientActionRobotJava ar;
-	public byte currentLevel = 7;//-1; // TODO: 
+	public byte currentLevel = 4;//-1; // TODO: 
 	public int failedCounter = 0;
 	public int[] solved;
 	TrajectoryPlanner tp; 
@@ -304,8 +304,11 @@ public class ClientNaiveAgent implements Runnable {
 				*/
 
 				//Este if es para si en hay un chancho obstruido hace el trio alto
-				if (highShoot)
+				if (highShoot && pts.size() > 1){
+					System.out.println("Se rompe acá en el HighShot??");
 					releasePoint = pts.get(1); //pts.get(1) -> tiro alto
+					System.out.println("Nop no se rompio ahí!");
+				}
 				else
 					releasePoint = pts.get(0); //pts.get(1) -> tiro bajo
 				

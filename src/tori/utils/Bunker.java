@@ -11,7 +11,7 @@ import ab.vision.ABObject;
  * @author msp20_000
  *
  */
-public class Bunker extends Building implements IBuilding {
+public class Bunker extends Building  {
 
 	/**
 	 * @param objs

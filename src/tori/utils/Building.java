@@ -41,6 +41,7 @@ public class Building
     public List<ABObject> pigs = new LinkedList<ABObject>();
     public List<ABObject> leftPigs = new LinkedList<ABObject>();
     public List<ABObject> rightPigs = new LinkedList<ABObject>();
+    public ABObject LeftBottomBlock;
 
     public List<Integer> distances = new LinkedList<Integer>();
 
@@ -63,7 +64,12 @@ public class Building
 		y = left.y;	
 		height = findHeight();
 		bounding = null;
-		
+		this.LeftBottomBlock = this.findLeftDownBlock();
+		// test print
+		System.out.println("Bloque de abajo a la izquierda: ");
+		System.out.println("posicion(" + this.LeftBottomBlock.x + ", " + this.LeftBottomBlock.y + 
+						   ")\tTipo: " + this.LeftBottomBlock.type.toString() + "\t#bloques: " + this.blocks.size());
+		System.out.println();
 	}
 
 	/**
@@ -90,6 +96,7 @@ public class Building
 	private Point findLeftCorner()
 	{
 		Point tmp = new Point(1000,1000);
+		
 
 		for (ABObject tmpObj : blocks)
 		{
@@ -101,6 +108,28 @@ public class Building
 		}
 
 		return tmp;
+	}
+	/**
+	*	Finds the top left corner of the building which is later stored in x and y
+	*/
+	private ABObject findLeftDownBlock()
+	{
+		Point tmp = new Point(0,0);
+		
+		ABObject temp = new ABObject();
+
+		for (ABObject tmpObj : blocks)
+		{
+			if (tmpObj.y > tmp.y || (tmpObj.y == tmp.y && tmpObj.x < tmp.x))
+			{
+				tmp.y = tmpObj.y;
+				tmp.x = tmpObj.x;
+				temp = tmpObj;
+			}
+			
+		}
+
+		return temp;
 	}
 	/**
 	*	@return creates the bounding rectangle of the building
@@ -132,7 +161,8 @@ public class Building
 	}
 
 	/**
-	*	Finds the x coordinate of corresponding y coordinate on the left side of the building and returns the corresponding object
+	*	Finds the x coordinate of corresponding y coordinate on the left side of the building 
+	*   and returns the corresponding object
 	*/
 	public ABObject findXCoor(int y)
 	{
@@ -1016,15 +1046,47 @@ public class Building
 	public static Building ClasifyBuilding( List<ABObject> total){
 		Building result = new Building(total); 
 		
-		double angle = total.get(0).angle;
-		for(ABObject bloque : total){
-			if(bloque.angle == angle){
-				
+		System.out.println("La construcción " + (result.tieneNBloquesAlineados(3) ? "SI " : "NO ") + "tiene 3 bloques alineados Horizontalmente");
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Funcion que comprueba si una construccion tiene N bloques alineados horizontalmente.
+	 * @param bloques : Bloques de la construccion
+	 * @param N: Numero de bloques alineados horizontalmente.
+	 * @return: true si Cumple, false en otro caso
+	 */
+	public boolean tieneNBloquesAlineados ( int N){
+		boolean result = false;
+		
+		List<ABObject> PorRevisar = new LinkedList<ABObject>();
+		PorRevisar.add(this.LeftBottomBlock);
+		List<ABObject> Revisados = new LinkedList<ABObject>();
+		int count = 1;
+		while(count == N || PorRevisar.size() !=0 ){
+			ABObject actual = PorRevisar.remove(0);
+			
+			List<ABObject> temp = actual.findAllDirectlyRight(this.blocks);
+			boolean TieneAlgoALaDerecha = false;
+			for (ABObject b : temp) {
+				if (!PorRevisar.contains(b) && !Revisados.contains(b) ) {
+					PorRevisar.add(b);
+					temp.remove(b);
+					TieneAlgoALaDerecha = true;
+				}
 			}
+			if(TieneAlgoALaDerecha){
+				count++;
+				TieneAlgoALaDerecha = false;
+			}
+			
 		}
 		
 		return result;
 	}
+	
 	
 	
 }

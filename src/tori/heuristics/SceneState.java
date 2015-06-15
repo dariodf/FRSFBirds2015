@@ -63,12 +63,12 @@ public class SceneState
         Pigs = pigs;
         Hills = hills;
         Blocks = blocks;
+        this.FreeBuildings = new LinkedList<Building>();
         this.Buildings = Building.FindBuildings(this.Blocks);
         Sling = sling;
         this.TNTs = TNTs;
-
-        prevTarget = prevTarget;
-        firstShot = firstShot;
+        this.prevTarget = prevTarget;
+        this.firstShot = firstShot;
     }
     
     
@@ -79,7 +79,7 @@ public class SceneState
     {
     	Birds = new LinkedList<ABObject>();
         BirdOnSling = ABType.Unknown;
-
+        this.FreeBuildings = new LinkedList<Building>();
         Pigs = new LinkedList<ABObject>();
         FreePigs = new LinkedList<ABObject>();
         ObstructedPigs = new LinkedList<ABObject>();
@@ -123,9 +123,6 @@ public class SceneState
         result += "---------TNTs---------\n";
         
         result += " # Total: " + this.TNTs.size() + ".\n";
-        Building bil =  new Building(objs);
-        Rectangle r =  new 	Rectangle();
-        r.
     	return result;
     }
     

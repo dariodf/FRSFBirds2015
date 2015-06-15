@@ -11,7 +11,7 @@ import ab.vision.ABObject;
  * @author msp20_000
  *
  */
-public class HouseOfCards extends Bunker implements IBuilding {
+public class HouseOfCards extends Bunker{
 
 	/**
 	 * @param objs
