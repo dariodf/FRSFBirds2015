@@ -33,7 +33,7 @@ public class ClientNaiveAgent implements Runnable {
 
 	//Wrapper of the communicating messages
 	private ClientActionRobotJava ar;
-	public byte currentLevel = 4;//-1; // TODO: 
+	public byte currentLevel = -1; // TODO: 
 	public int failedCounter = 0;
 	public int[] solved;
 	TrajectoryPlanner tp; 
@@ -395,6 +395,7 @@ public class ClientNaiveAgent implements Runnable {
 	 * @param vision
 	 */
 	private void percibirElementosDeLaEscena(Vision vision) {
+		
 		/// TODO: Si se necesitan los otros objetos en la pantalla Descomentar las lineas necesarias.
  		/// ( ^___^)b d(^___^ )
 		///

@@ -66,11 +66,12 @@ public class Building
 		bounding = null;
 		this.LeftBottomBlock = this.findLeftDownBlock();
 		// test print
-		System.out.println("Bloque de abajo a la izquierda: ");
-		System.out.println("posicion(" + this.LeftBottomBlock.x + ", " + this.LeftBottomBlock.y + 
-						   ")\tTipo: " + this.LeftBottomBlock.type.toString() + "\t#bloques: " + this.blocks.size());
-		System.out.println();
+//		System.out.println("Bloque de abajo a la izquierda: ");
+//		System.out.println("posicion(" + this.LeftBottomBlock.x + ", " + this.LeftBottomBlock.y + 
+//						   ")\tTipo: " + this.LeftBottomBlock.type.toString() + "\t#bloques: " + this.blocks.size());
+//		System.out.println();
 	}
+	
 
 	/**
 	*	Returns the height of the building.
@@ -1046,8 +1047,14 @@ public class Building
 	public static Building ClasifyBuilding( List<ABObject> total){
 		Building result = new Building(total); 
 		
-		System.out.println("La construcción " + (result.tieneNBloquesAlineados(3) ? "SI " : "NO ") + "tiene 3 bloques alineados Horizontalmente");
-		
+//		System.out.println("Densidad: " + result.Densidad() + "\n");
+		if(result.Densidad() < 0.40){
+			result = new HouseOfCards(result);
+		}
+		else 
+			result = new Bunker(result);
+			
+		System.out.println(result.toString());
 		return result;
 	}
 	
@@ -1060,20 +1067,19 @@ public class Building
 	 */
 	public boolean tieneNBloquesAlineados ( int N){
 		boolean result = false;
-		
 		List<ABObject> PorRevisar = new LinkedList<ABObject>();
 		PorRevisar.add(this.LeftBottomBlock);
-		List<ABObject> Revisados = new LinkedList<ABObject>();
 		int count = 1;
-		while(count == N || PorRevisar.size() !=0 ){
+		while(count == N || PorRevisar.size() > 0 ){
 			ABObject actual = PorRevisar.remove(0);
 			
 			List<ABObject> temp = actual.findAllDirectlyRight(this.blocks);
+			
 			boolean TieneAlgoALaDerecha = false;
 			for (ABObject b : temp) {
-				if (!PorRevisar.contains(b) && !Revisados.contains(b) ) {
+				if (!PorRevisar.contains(b)) {
 					PorRevisar.add(b);
-					temp.remove(b);
+//					temp.remove(b);
 					TieneAlgoALaDerecha = true;
 				}
 			}
@@ -1083,10 +1089,36 @@ public class Building
 			}
 			
 		}
-		
 		return result;
 	}
 	
+	public double Densidad(){
+		double result = 0.0;
+		
+		for (ABObject block : this.blocks) {
+			result += block.getArea();
+		}
+//		System.out.println("result: " + result);
+		Rectangle r = this.getBoundingRect();
+//		System.out.println("area: " + r.height*r.width);
+		 result /= (r.height*r.width);
+		 return result; 
+	}
 	
+	public String GetBuildingType(){
+		return "Building";
+	}
 	
+	@Override 
+	public String toString() {
+		
+		String message= "--------------------------------------------------";
+		message += "\nTipo de Construccion: " + this.GetBuildingType();
+		message += "\nCantidad de Bloques: " + this.blocks.size();
+		message += "\nDensidad:" + this.Densidad();
+		message += "\nDimensiones (hxw): " + this.getBoundingRect().height + "x" + 
+					this.getBoundingRect().width; 
+		
+		return message;
+	}
 }

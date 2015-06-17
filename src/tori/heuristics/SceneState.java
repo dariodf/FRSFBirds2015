@@ -16,7 +16,13 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
+import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
+
 import tori.utils.Building;
+import tori.utils.Bunker;
+import tori.utils.HouseOfCards;
 import ab.vision.ABObject;
 import ab.vision.ABType;
 /**
@@ -110,6 +116,17 @@ public class SceneState
         result += "---------Construcciones---------\n";
         
         result += " # Total: " + this.Buildings.size() + ". (2 o más bloques)\n";
+        int HoC = 0,
+        	Bkr = 0;
+        for (Building bld : this.Buildings) {
+			if ( bld instanceof HouseOfCards){
+				HoC ++;
+			} else if (bld instanceof Bunker) {
+				Bkr ++;
+			}
+		}
+        result += " # House of Cards: " + HoC + "\n";
+        result += " # Bunkers: " + Bkr + "\n";
         
         result += "---------Pájaros---------\n";
         

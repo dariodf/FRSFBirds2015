@@ -3,8 +3,10 @@
  */
 package tori.utils;
 
+import java.util.LinkedList;
 import java.util.List;
 
+import jdk.nashorn.internal.objects.annotations.Constructor;
 import ab.vision.ABObject;
 
 /**
@@ -20,5 +22,13 @@ public class HouseOfCards extends Bunker{
 		super(objs);
 		// TODO Auto-generated constructor stub
 	}
+	
+	public HouseOfCards(Building bld){
+		super( new LinkedList<ABObject>(bld.blocks));
+	}
 
+	@Override
+	public String GetBuildingType(){
+		return "House of Cards";
+	}
 }

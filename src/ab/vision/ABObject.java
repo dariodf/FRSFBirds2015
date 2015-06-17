@@ -52,6 +52,9 @@ public class ABObject extends Rectangle
 
 	public Point trajectoryHitPoint = null;
 
+	public double getArea(){
+		return this.width * this.height;
+	}
 
 	public ABObject(Rectangle mbr, ABType type) 
 	{
