@@ -18,7 +18,6 @@ import java.util.List;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
-import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 
 import tori.utils.Building;
 import tori.utils.Bunker;
@@ -115,18 +114,32 @@ public class SceneState
         
         result += "---------Construcciones---------\n";
         
-        result += " # Total: " + this.Buildings.size() + ". (2 o más bloques)\n";
+        result += " # Total: " + this.Buildings.size() + this.FreeBuildings.size() + ". (2 o más bloques)\n";
+        result += " # Con chanchos dentro: " + this.Buildings.size() + ".\n";
+        result += " # Libres: " + this.FreeBuildings.size() + ".\n";
         int HoC = 0,
-        	Bkr = 0;
-        for (Building bld : this.Buildings) {
-			if ( bld instanceof HouseOfCards){
-				HoC ++;
-			} else if (bld instanceof Bunker) {
-				Bkr ++;
-			}
+        	Bkr = 0,
+        	Twr = 0;
+        List<Building> blds = new LinkedList<Building>();
+        blds.addAll(this.Buildings);
+        blds.addAll(this.FreeBuildings);
+        for (Building bld : blds) {
+        	
+        	switch(bld.GetBuildingType()){
+        		case "Bunker":
+        			Bkr ++;
+        			break;
+        		case "House of Cards":
+        			HoC ++;
+        			break;
+        		case "Tower": 
+        			Twr ++;
+        			break;
+        	}
 		}
         result += " # House of Cards: " + HoC + "\n";
         result += " # Bunkers: " + Bkr + "\n";
+        result += " # Tower: " + Twr + "\n";
         
         result += "---------Pájaros---------\n";
         

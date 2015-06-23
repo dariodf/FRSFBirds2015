@@ -65,6 +65,7 @@ public class Building
 		height = findHeight();
 		bounding = null;
 		this.LeftBottomBlock = this.findLeftDownBlock();
+		
 		// test print
 //		System.out.println("Bloque de abajo a la izquierda: ");
 //		System.out.println("posicion(" + this.LeftBottomBlock.x + ", " + this.LeftBottomBlock.y + 
@@ -1048,12 +1049,17 @@ public class Building
 		Building result = new Building(total); 
 		
 //		System.out.println("Densidad: " + result.Densidad() + "\n");
-		if(result.Densidad() < 0.40){
+		if(result.Densidad() < 0.39 || result.blocks.size() < 4){
 			result = new HouseOfCards(result);
 		}
-		else 
-			result = new Bunker(result);
-			
+		else {
+			Rectangle boundary = result.getBoundingRect();
+			if((boundary.height * 0.7) >= boundary.width){
+				result = new Tower(result);
+			}
+			else
+				result = new Bunker(result);
+		}
 		System.out.println(result.toString());
 		return result;
 	}

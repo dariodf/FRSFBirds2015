@@ -3,6 +3,7 @@
  */
 package tori.utils;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import ab.vision.ABObject;
@@ -19,4 +20,14 @@ public class Tower extends Bunker  {
 		// TODO Auto-generated constructor stub
 	}
 
+	public Tower(Building bld) {
+		// TODO Auto-generated constructor stub
+		super( new LinkedList<ABObject>(bld.blocks));
+	}
+
+	@Override
+	public String GetBuildingType(){
+		return "Tower";
+	}
+	
 }

@@ -33,7 +33,7 @@ public class ClientNaiveAgent implements Runnable {
 
 	//Wrapper of the communicating messages
 	private ClientActionRobotJava ar;
-	public byte currentLevel = -1; // TODO: 
+	public byte currentLevel = 2; // TODO: 
 	public int failedCounter = 0;
 	public int[] solved;
 	TrajectoryPlanner tp; 
