@@ -198,13 +198,13 @@ public class ABObject extends Rectangle
 
 		@SuppressWarnings("unused")
 		int o2down = y + height;
-		int o2right = x + width;
+		int right = x + width;
 
 		int o1right = o1.x + o1.width;
 		
 		if (getCenterY() -  deviation > o1.y 
-				|| (o1right -deviation < x) 
-		 		||  (o1.x + deviation  > o2right) 
+				|| (o1right - deviation < x) 
+		 		|| (right - deviation < o1.x) 
 		  	)
 			return false;
 		
@@ -380,7 +380,32 @@ public class ABObject extends Rectangle
 				sorted.add(obj);			
 
 		return sorted;
-	}	
+	}
+	
+	/**
+	 *	Encuentra todos los objetos que estan directamente arriba (tocan) del objeto que llama al metodo (ponele)
+	 */
+	public List<ABObject> findAllDirectlyAboveTWO(List<ABObject> objs)
+	{	//TODO
+		int right = x + width;
+
+		List<ABObject> sorted = new LinkedList<ABObject>();
+		
+			for (ABObject obj : objs){
+				int obj_right = obj.x + obj.width;
+				int obj_bot = obj.y + obj.height;
+				
+				if(obj_bot <= y && touches(obj)){
+					if(obj.x >= x && obj.x <= right)
+						sorted.add(obj);
+					else if(obj_right >= x && obj_right <= right)
+						sorted.add(obj);
+				}		
+			}
+				
+		return sorted;
+	}
+		
    /**
     *	finds all objects that are above this
     */

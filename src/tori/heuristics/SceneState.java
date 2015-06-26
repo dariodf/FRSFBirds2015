@@ -114,7 +114,7 @@ public class SceneState
         
         result += "---------Construcciones---------\n";
         
-        result += " # Total: " + this.Buildings.size() + this.FreeBuildings.size() + ". (2 o más bloques)\n";
+        result += " # Total: " + ( this.Buildings.size() + this.FreeBuildings.size() ) + ". (2 o más bloques)\n";
         result += " # Con chanchos dentro: " + this.Buildings.size() + ".\n";
         result += " # Libres: " + this.FreeBuildings.size() + ".\n";
         int HoC = 0,

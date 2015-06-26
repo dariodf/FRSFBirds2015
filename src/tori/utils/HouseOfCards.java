@@ -6,7 +6,6 @@ package tori.utils;
 import java.util.LinkedList;
 import java.util.List;
 
-import jdk.nashorn.internal.objects.annotations.Constructor;
 import ab.vision.ABObject;
 
 /**

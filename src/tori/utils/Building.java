@@ -161,6 +161,30 @@ public class Building
 			return bounding;
 		}
 	}
+	
+	/**
+	*	@return Crea un rectando sin objetos no-representativos del ancho del mismo (ponele)
+	*/
+	public Rectangle getBoundingRectTWO()
+	{
+		int mostleft = 1000;
+		int mostright = 0;
+		    
+		for (ABObject obj : blocks) {
+			
+			if( !obj.findAllDirectlyAboveTWO(blocks).isEmpty() ){
+				if (obj.x < mostleft)
+					mostleft = obj.x;
+				if ((obj.x + obj.width) > mostright)
+					mostright = obj.x + obj.width;
+			}
+		}
+
+		Rectangle rectangulo = new  Rectangle(mostleft, y, mostright-mostleft, height);
+		
+		return rectangulo;
+		
+	}
 
 	/**
 	*	Finds the x coordinate of corresponding y coordinate on the left side of the building 
@@ -1044,78 +1068,62 @@ public class Building
         return result;
     }
 	
-
+/**
+ * 
+ * @param total
+ * @return
+ */
 	public static Building ClasifyBuilding( List<ABObject> total){
 		Building result = new Building(total); 
 		
-//		System.out.println("Densidad: " + result.Densidad() + "\n");
 		if(result.Densidad() < 0.39 || result.blocks.size() < 4){
 			result = new HouseOfCards(result);
 		}
 		else {
-			Rectangle boundary = result.getBoundingRect();
-			if((boundary.height * 0.7) >= boundary.width){
+			Rectangle boundary = result.getBoundingRectTWO();
+//			System.out.println("Alto: " + boundary.height + ">= Ancho: " + boundary.width  + " * 1.3\n");
+			if(boundary.height >= (boundary.width * 1.3)){
 				result = new Tower(result);
 			}
-			else
+			else{
 				result = new Bunker(result);
+			}
+
 		}
+//		System.out.println("esto es una basofia, todos son una basofia, he visto muchas basofia, pero esta es la mas basofia de la basofia");
 		System.out.println(result.toString());
 		return result;
 	}
 	
-	
 	/**
-	 * Funcion que comprueba si una construccion tiene N bloques alineados horizontalmente.
-	 * @param bloques : Bloques de la construccion
-	 * @param N: Numero de bloques alineados horizontalmente.
-	 * @return: true si Cumple, false en otro caso
+	 * 
+	 * @return
 	 */
-	public boolean tieneNBloquesAlineados ( int N){
-		boolean result = false;
-		List<ABObject> PorRevisar = new LinkedList<ABObject>();
-		PorRevisar.add(this.LeftBottomBlock);
-		int count = 1;
-		while(count == N || PorRevisar.size() > 0 ){
-			ABObject actual = PorRevisar.remove(0);
-			
-			List<ABObject> temp = actual.findAllDirectlyRight(this.blocks);
-			
-			boolean TieneAlgoALaDerecha = false;
-			for (ABObject b : temp) {
-				if (!PorRevisar.contains(b)) {
-					PorRevisar.add(b);
-//					temp.remove(b);
-					TieneAlgoALaDerecha = true;
-				}
-			}
-			if(TieneAlgoALaDerecha){
-				count++;
-				TieneAlgoALaDerecha = false;
-			}
-			
-		}
-		return result;
-	}
-	
 	public double Densidad(){
 		double result = 0.0;
 		
 		for (ABObject block : this.blocks) {
 			result += block.getArea();
 		}
-//		System.out.println("result: " + result);
 		Rectangle r = this.getBoundingRect();
-//		System.out.println("area: " + r.height*r.width);
-		 result /= (r.height*r.width);
-		 return result; 
+		result /= (r.height*r.width);
+		
+		return result; 
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String GetBuildingType(){
 		return "Building";
 	}
 	
-	@Override 
+	
+	/**
+	 * 
+	 */
+	@Override
 	public String toString() {
 		
 		String message= "--------------------------------------------------";
@@ -1127,4 +1135,49 @@ public class Building
 		
 		return message;
 	}
+
+
+/**
+ * Funcion que comprueba si una construccion tiene N bloques alineados horizontalmente.
+ * @param bloques : Bloques de la construccion
+ * @param N: Numero de bloques alineados horizontalmente.
+ * @return: true si Cumple, false en otro caso
+ */
+public boolean tieneNBloquesAlineados ( int N){
+	boolean result = false;
+	List<ABObject> PorRevisar = new LinkedList<ABObject>();
+	PorRevisar.add(this.LeftBottomBlock);
+	int count = 1;
+	while(count == N || PorRevisar.size() > 0 ){
+		ABObject actual = PorRevisar.remove(0);
+		
+		List<ABObject> temp = actual.findAllDirectlyRight(this.blocks);
+		
+		boolean TieneAlgoALaDerecha = false;
+		for (ABObject b : temp) {
+			if (!PorRevisar.contains(b)) {
+				PorRevisar.add(b);
+				TieneAlgoALaDerecha = true;
+			}
+		}
+		if(TieneAlgoALaDerecha){
+			count++;
+			TieneAlgoALaDerecha = false;
+		}
+		
+	}
+	return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 }
