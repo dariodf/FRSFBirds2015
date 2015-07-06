@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-
 import tori.heuristics.SceneState;
 import tori.utils.Building;
 import ab.demo.other.ClientActionRobot;
@@ -225,10 +224,6 @@ public class ClientNaiveAgent implements Runnable {
 			this.Scene.Sling = vision.findSlingshotMBR();
 		}
 
-		
-		
-		
- 		
  		/*for (ABObject block : this.Scene.Blocks) {
  			 System.out.println(block.toString());
  		}*/
@@ -246,10 +241,17 @@ public class ClientNaiveAgent implements Runnable {
 				/**********************************************/
 				/** TODO: IMPLEMENTAR INTELIGENCIA **/
 				/**********************************************/
+				
+				//TODO ¿REGLAS? Por las cuales se seleccionará el target. De momento, se selecciona un cerdo,
+				//deberia de considerarse q el target puede llegar a ser una estructura o punto arbitrario
+				Point target;
+				
+				
 				ABObject pig = new ABObject();
-				/*if(!this.Scene.CircularBlocks.isEmpty())
-					pig = this.Scene.CircularBlocks.get(0);
-				else */
+			/*	if(!this.Scene.CircularBlocks.isEmpty())
+				pig = this.Scene.CircularBlocks.get(0);
+				else 
+			*/
 				
 				if(!this.Scene.FreePigs.isEmpty())
 					pig = this.Scene.FreePigs.get(0);
@@ -261,70 +263,49 @@ public class ClientNaiveAgent implements Runnable {
 					pig = this.Scene.PigsInBuildings.get(0);
 				else 
 					System.out.println("NO ENCONTRO OBJETO PARA DISPARA");
-				
-				
-				System.out.println();
+								
+			/*	System.out.println();
 				System.out.println("Seleccionado Chancho[" + this.Scene.Pigs.indexOf(pig) + "] en la pos: ( " + pig.x + ", " + pig.y + " )");
 				System.out.println();
+			*/	
+				
 				
 				//TODO SELECION DE PUNTO A DONDE DISPARA
-				Point _tpt = pig.getCenter();
+				target = pig.getCenter();
 				
 				// if the target is very close to before, randomly choose a
 				// point near it
-				if (this.Scene.prevTarget != null && distance(this.Scene.prevTarget, _tpt) < 10) {
+				if (this.Scene.prevTarget != null && distance(this.Scene.prevTarget, target) < 10) {
 					double _angle = randomGenerator.nextDouble() * Math.PI * 2;
-					_tpt.x = _tpt.x + (int) (Math.cos(_angle) * 10);
-					_tpt.y = _tpt.y + (int) (Math.sin(_angle) * 10);
-					System.out.println("Randomly changing to " + _tpt);
+					target.x = target.x + (int) (Math.cos(_angle) * 10);
+					target.y = target.y + (int) (Math.sin(_angle) * 10);
+					System.out.println("Randomly changing to " + target);
 				}
 
-				this.Scene.prevTarget = new Point(_tpt.x, _tpt.y);
+				this.Scene.prevTarget = new Point(target.x, target.y);
 
 				// estimate the trajectory
-				ArrayList<Point> pts = tp.estimateLaunchPoint(this.Scene.Sling, _tpt);
+				ArrayList<Point> pts = tp.estimateLaunchPoint(this.Scene.Sling, target);
+				
 
-				// do a high shot when entering a level to find an accurate velocity
-				/*
-				if (this.Scene.firstShot && pts.size() > 1) {
-					releasePoint = pts.get(1);
-				} else 
-					if (pts.size() == 1)
-						releasePoint = pts.get(0);
-					else 
-						if(pts.size() == 2)	{
-							System.out.println("first shot " + this.Scene.firstShot);
-							// randomly choose between the trajectories, with a 1 in
-							// 6 chance of choosing the high one
-							if (randomGenerator.nextInt(6) == 0)
-								releasePoint = pts.get(1);
-							else
-								releasePoint = pts.get(0);
-						}
-				*/
-
-				//Este if es para si en hay un chancho obstruido hace el trio alto
+				//Este if es para que si en hay un chancho obstruido hace el tiro alto
 				if (highShoot && pts.size() > 1){
-					System.out.println("Se rompe acá en el HighShot??");
 					releasePoint = pts.get(1); //pts.get(1) -> tiro alto
-					System.out.println("Nop no se rompio ahí!");
 				}
 				else
-					releasePoint = pts.get(0); //pts.get(1) -> tiro bajo
+					releasePoint = pts.get(0); //pts.get(0) -> tiro bajo
 				
 				Point refPoint = tp.getReferencePoint(this.Scene.Sling);
 
 				// Get the release point from the trajectory prediction module
 				int tapTime = 0;
 				if (releasePoint != null) {
-					double releaseAngle = tp.getReleaseAngle(this.Scene.Sling,
-							releasePoint);
+					double releaseAngle = tp.getReleaseAngle(this.Scene.Sling, releasePoint);
 					System.out.println("Release Point: " + releasePoint);
-					System.out.println("Release Angle: "
-							+ Math.toDegrees(releaseAngle));
-					int tapInterval = 0;
+					System.out.println("Release Angle: " + Math.toDegrees(releaseAngle));
+				
+			/*		int tapInterval = 0;					
 					
-					/*
 					switch (this.Scene.BirdOnSling) 
 					{
 						case RedBird:
@@ -341,10 +322,10 @@ public class ClientNaiveAgent implements Runnable {
 							tapInterval =  60;
 					}
 					tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, _tpt, tapInterval);
-					*/
+			*/
 					
-					Point tapPoint = new Point(_tpt.x, _tpt.y);
-					tapTime = tp.getTapTimeFromPoint(this.Scene.Sling, releasePoint, _tpt, tapPoint);
+					Point tapPoint = new Point(target.x, target.y);
+					tapTime = tp.getTapTimeFromPoint(this.Scene.Sling, releasePoint, target, tapPoint);
 					
 				} else {
 					System.err.println("No Release Point Found");
