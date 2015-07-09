@@ -199,7 +199,7 @@ public class VisionRealShape
           comparator.sortByWidth();
           comparator.sortDesc();
           Collections.sort(pigs, comparator);
-          System.out.println();
+          System.out.println("\n##### DATOS DE LOS CHANCOS #####");
           for (ABObject p : pigs) {
         	  System.out.println("chancho: Diametro:" + p.getWidth() + "  Posicion: ( "+ p.x + ", " + p.y + ")");
 		}

@@ -11,17 +11,10 @@ package tori.heuristics;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
-
-
 import tori.utils.Building;
-import tori.utils.Bunker;
-import tori.utils.HouseOfCards;
 import ab.vision.ABObject;
 import ab.vision.ABType;
 /**
@@ -102,21 +95,25 @@ public class SceneState
     }
     
     @Override public String toString() {
-    	String result = "---------Chanchos---------\n";
+    	String result = "##### DATOS DEL ESCENARIO #####\n";
+    	result += "---------Chanchos------------------------\n";
     	result += " # Total: " + this.Pigs.size() + ".\n";
         result += " # En Construcción: " + this.PigsInBuildings.size() + ".\n";
         result += " # Chanchos Obstruidos: " + this.ObstructedPigs.size() + ".\n";
         result += " # Chanchos Libres: " + this.FreePigs.size() + ".\n";
         
-        result += "---------Bloques---------\n";
+        result += "---------Bloques-------------------------\n";
         result += " # Total: " + this.Blocks.size() + ".\n";
         result += " # Circulares: " + this.CircularBlocks.size() + ".\n";
         
-        result += "---------Construcciones---------\n";
+        result += "---------Construcciones------------------\n";
         
         result += " # Total: " + ( this.Buildings.size() + this.FreeBuildings.size() ) + ". (2 o más bloques)\n";
         result += " # Con chanchos dentro: " + this.Buildings.size() + ".\n";
-        result += " # Libres: " + this.FreeBuildings.size() + ".\n";
+        result += " # Sin chanchos dentro: " + this.FreeBuildings.size() + ".\n";
+        
+        result += "---------Tipos de Construcciones---------\n";
+        
         int HoC = 0,
         	Bkr = 0,
         	Twr = 0;
@@ -141,16 +138,16 @@ public class SceneState
         result += " # Bunkers: " + Bkr + "\n";
         result += " # Tower: " + Twr + "\n";
         
-        result += "---------Pájaros---------\n";
+        result += "---------Pájaros-------------------------\n";
         
         result += " # Total: " + this.Birds.size() + ".\n";
         result += " # En la resortera: " + this.BirdOnSling.toString() + ".\n"; 
         
-        result += "---------Colinas---------\n";
+        result += "---------Colinas-------------------------\n";
         
         result += " # Total: " + this.Hills.size() + ".\n";
         
-        result += "---------TNTs---------\n";
+        result += "---------TNTs----------------------------\n";
         
         result += " # Total: " + this.TNTs.size() + ".\n";
     	return result;

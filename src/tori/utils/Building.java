@@ -13,21 +13,18 @@ package tori.utils;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Color;
 import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 import tori.heuristics.SceneState;
-import ab.vision.*;
-import ab.vision.real.shape.Rect;
-import ab.demo.other.ClientActionRobot;
-import ab.demo.other.ClientActionRobotJava;
 import ab.planner.TrajectoryPlanner;
+import ab.vision.ABObject;
+import ab.vision.ABType;
+import ab.vision.real.shape.Rect;
 
 /**
 *	This class encorporates the building structure. All the connected components are in the blocks variable.
@@ -45,7 +42,7 @@ public class Building
 
     public List<Integer> distances = new LinkedList<Integer>();
 
-    private Rectangle bounding;
+    public Rectangle bounding;
 
 
     public static final int PIG_VALUE = 5000;
@@ -252,6 +249,7 @@ public class Building
 	/**
 	*	@return all the objects on the left side of the building
 	*/
+	@SuppressWarnings("unused")
 	private List<ABObject> getLeftBlocks(List<ABObject> erasedBlocks, List<ABObject> allBlocks)
 	{
 
@@ -335,6 +333,7 @@ public class Building
 	*	Finds the blocks that straight and touch with a non straight block.
 	*	These blocks are then used in the second round of block selection.
 	*/
+	@SuppressWarnings("unused")
 	private List<ABObject> getSpareLeftBlocks(List<ABObject> erasedBlocks)
 	{
 		List<ABObject> nonStraight = findNonStraightBlocks(erasedBlocks);
@@ -381,6 +380,7 @@ public class Building
 	*	Finds the right value in the utility arrays for a given percentage.
 	*	@return the right utility value
 	*/
+	@SuppressWarnings("unused")
 	private double findPercentage(double [][] points, double target)
 	{
 		for (int i = 0; i < points.length; ++i )
@@ -471,6 +471,7 @@ public class Building
 	*	Calculates the utility for pigs that are either in the building or that are next to the building.
 	*	The utility depends on the building type, the position of the pigs and relative position of the target block.
 	*/
+	@SuppressWarnings("unused")
 	private int pigsInTheWay(double upPercentage, boolean directly, double downPercentage, int downPixels, double leftPercentage, double rightPercentage, ABObject target)
 	{
 		int ret = 0;
@@ -924,7 +925,7 @@ public class Building
         		boundingboxes.add(b);
  
         }
-        System.out.println("\nSe han encontrado " + boundingboxes.size() + " Consrucciones.\n");
+        System.out.println("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSRUCCIONES.\n");
         return boundingboxes;
     }
 	/**
@@ -956,7 +957,6 @@ public class Building
             }
         }
         Building bld =  ClasifyBuilding(total);
-//        Building bld = new Building(total);
         return bld;
 	}
 	
@@ -1080,7 +1080,7 @@ public class Building
 			result = new HouseOfCards(result);
 		}
 		else {
-			Rectangle boundary = result.getBoundingRectTWO();
+			Rectangle boundary = result.getBoundingRect();
 //			System.out.println("Alto: " + boundary.height + ">= Ancho: " + boundary.width  + " * 1.3\n");
 			if(boundary.height >= (boundary.width * 1.3)){
 				result = new Tower(result);
@@ -1090,7 +1090,7 @@ public class Building
 			}
 
 		}
-//		System.out.println("esto es una basofia, todos son una basofia, he visto muchas basofia, pero esta es la mas basofia de la basofia");
+		
 		System.out.println(result.toString());
 		return result;
 	}

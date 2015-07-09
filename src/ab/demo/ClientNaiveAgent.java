@@ -12,17 +12,15 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import tori.heuristics.SceneClassifier;
 import tori.heuristics.SceneState;
-import tori.utils.Building;
 import ab.demo.other.ClientActionRobot;
 import ab.demo.other.ClientActionRobotJava;
 import ab.planner.TrajectoryPlanner;
 import ab.vision.ABObject;
-import ab.vision.ABShape;
 import ab.vision.GameStateExtractor.GameState;
 import ab.vision.Vision;
 //Naive agent (server/client version)
@@ -32,11 +30,11 @@ public class ClientNaiveAgent implements Runnable {
 
 	//Wrapper of the communicating messages
 	private ClientActionRobotJava ar;
-	public byte currentLevel = 4; // TODO: UNO MENOS DEL NIVEL QUE QUEREMOS
+	public byte currentLevel = 0; // TODO: UNO MENOS DEL NIVEL QUE QUEREMOS
 	public int failedCounter = 0;
 	public int[] solved;
 	TrajectoryPlanner tp; 
-	private int id = 28888;
+	private int id = 18077;
 	private SceneState Scene;
 	private Random randomGenerator;
 	/**
@@ -95,6 +93,7 @@ public class ClientNaiveAgent implements Runnable {
     /* 
      * Run the Client (Naive Agent)
      */
+	@SuppressWarnings("unused")
 	private void checkMyScore()
 	{
 		
@@ -109,17 +108,30 @@ public class ClientNaiveAgent implements Runnable {
 			level ++;
 		}
 	}
+	
+	@SuppressWarnings("unused")
+	private void GlobalBestScore(){
+		//display the global best scores
+		int[] scores = ar.checkScore();
+		System.out.println("Global best score: ");
+		for (int i = 0; i < scores.length ; i ++)
+		{
+		
+			System.out.print( " level " + (i+1) + ": " + scores[i]);
+		}
+		System.out.println();
+	}
+	
 	public void run() {	
 		byte[] info = ar.configure(ClientActionRobot.intToByteArray(id));
 		solved = new int[info[2]];
 		
 		//load the initial level (default 1)
 		//Check my score
-		checkMyScore();
+		//checkMyScore();
 		
 		currentLevel = (byte)getNextLevel(); 
 		ar.loadLevel(currentLevel);
-		//ar.loadLevel((byte)9);
 		GameState state;
 		while (true) {
 			
@@ -129,21 +141,14 @@ public class ClientNaiveAgent implements Runnable {
 			//If the level is solved , go to the next level
 			if (state == GameState.WON) {
 							
-				///System.out.println(" loading the level " + (currentLevel + 1) );
-				checkMyScore();
+				System.out.println("###########################################");
+				System.out.println("=> LOADING THE LEVEL " + (currentLevel + 1) );
+				System.out.println("###########################################");
+				//checkMyScore();
 				System.out.println();
 				currentLevel = (byte)getNextLevel(); 
 				ar.loadLevel(currentLevel);
-				//ar.loadLevel((byte)9);
-				//display the global best scores
-				int[] scores = ar.checkScore();
-				System.out.println("Global best score: ");
-				for (int i = 0; i < scores.length ; i ++)
-				{
-				
-					System.out.print( " level " + (i+1) + ": " + scores[i]);
-				}
-				System.out.println();
+				//GlobalBestScore();
 				
 				// make a new trajectory planner whenever a new level is entered
 				tp = new TrajectoryPlanner();
@@ -224,10 +229,6 @@ public class ClientNaiveAgent implements Runnable {
 			this.Scene.Sling = vision.findSlingshotMBR();
 		}
 
- 		/*for (ABObject block : this.Scene.Blocks) {
- 			 System.out.println(block.toString());
- 		}*/
- 		
 		GameState state = ar.checkState();
 		// if there is a sling, then play, otherwise skip.
 		if (this.Scene.Sling != null) {
@@ -248,10 +249,6 @@ public class ClientNaiveAgent implements Runnable {
 				
 				
 				ABObject pig = new ABObject();
-			/*	if(!this.Scene.CircularBlocks.isEmpty())
-				pig = this.Scene.CircularBlocks.get(0);
-				else 
-			*/
 				
 				if(!this.Scene.FreePigs.isEmpty())
 					pig = this.Scene.FreePigs.get(0);
@@ -264,10 +261,9 @@ public class ClientNaiveAgent implements Runnable {
 				else 
 					System.out.println("NO ENCONTRO OBJETO PARA DISPARA");
 								
-			/*	System.out.println();
+				System.out.println("##### PREPARANDO DISPARO #####");
 				System.out.println("Seleccionado Chancho[" + this.Scene.Pigs.indexOf(pig) + "] en la pos: ( " + pig.x + ", " + pig.y + " )");
 				System.out.println();
-			*/	
 				
 				
 				//TODO SELECION DE PUNTO A DONDE DISPARA
@@ -380,39 +376,41 @@ public class ClientNaiveAgent implements Runnable {
 		/// TODO: Si se necesitan los otros objetos en la pantalla Descomentar las lineas necesarias.
  		/// ( ^___^)b d(^___^ )
 		///
-		this.Scene.Sling = vision.findSlingshotMBR(); // Sling
+//		this.Scene.Sling = vision.findSlingshotMBR(); // Sling
+//		
+//		List<ABObject> temp = vision.findPigsRealShape() ;
+//		this.Scene.Pigs = (temp != null) ? temp : new LinkedList<ABObject>(); // Pigs
+//		temp = vision.findBlocksRealShape();
+//		this.Scene.Blocks = (temp != null) ? temp : new LinkedList<ABObject>(); // Blocks
+//		temp = vision.findBirdsRealShape(); // Birds
+//        this.Scene.Birds = (temp != null) ? temp : new LinkedList<ABObject>();
+//        temp = vision.findHills();
+//		this.Scene.Hills = (temp != null) ? temp : new LinkedList<ABObject>(); // Hills
+//		temp = vision.findTNTs();
+//		this.Scene.TNTs = (temp != null) ? temp : new LinkedList<ABObject>(); // TNTs
+//		this.Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
+//		//this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks); // Construcciones
+//		this.Scene.Buildings = Building.FindBuildings(this.Scene); // Construcciones con chanchos
+//
+//		// TODO: Ver en que clase agregar esto....
+//		this.Scene.CircularBlocks.clear();
+//		for (ABObject b : this.Scene.Blocks) {
+//			if (b.shape == ABShape.Circle) {
+//				this.Scene.CircularBlocks.add(b);
+//			}
+//		}
+//		
+//		//TODO: Testing
+//		String s = "";
+//		for (ABObject p : this.Scene.Pigs) {
+//			s += String.format("Chancho: %d, %d \tAtrapado: %s\n", p.x, p.y, p.isSomethingBigAbove(this.Scene.Blocks));
+//		}
+//		System.out.println(s);
+//		
+//		
+//		System.out.println(this.Scene.toString());
+		new SceneClassifier().Identify(Scene, vision, ar);
 		
-		List<ABObject> temp = vision.findPigsRealShape() ;
-		this.Scene.Pigs = (temp != null) ? temp : new LinkedList<ABObject>(); // Pigs
-		temp = vision.findBlocksRealShape();
-		this.Scene.Blocks = (temp != null) ? temp : new LinkedList<ABObject>(); // Blocks
-		temp = vision.findBirdsRealShape(); // Birds
-        this.Scene.Birds = (temp != null) ? temp : new LinkedList<ABObject>();
-        temp = vision.findHills();
-		this.Scene.Hills = (temp != null) ? temp : new LinkedList<ABObject>(); // Hills
-		temp = vision.findTNTs();
-		this.Scene.TNTs = (temp != null) ? temp : new LinkedList<ABObject>(); // TNTs
-		this.Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
-		//this.Scene.Buildings = Building.FindBuildings(this.Scene.Blocks); // Construcciones
-		this.Scene.Buildings = Building.FindBuildings(this.Scene); // Construcciones con chanchos
-
-		// TODO: Ver en que clase agregar esto....
-		this.Scene.CircularBlocks.clear();
-		for (ABObject b : this.Scene.Blocks) {
-			if (b.shape == ABShape.Circle) {
-				this.Scene.CircularBlocks.add(b);
-			}
-		}
-		
-		//TODO: Testing
-		String s = "";
-		for (ABObject p : this.Scene.Pigs) {
-			s += String.format("Chancho: %d, %d \tAtrapado: %s\n", p.x, p.y, p.isSomethingBigAbove(this.Scene.Blocks));
-		}
-		System.out.println(s);
-		
-		
-		System.out.println(this.Scene.toString());
 	}
 
 	private double distance(Point p1, Point p2) {

@@ -497,6 +497,13 @@ public class TrajectoryPlanner {
 		
 		double y, yWidth, offset;
 		
+		/*
+		if(object.y < target.y)
+			return false;
+		
+		if(object.x >= target.x)
+			return false;
+		*/
 		//Punto de la resoltera
 		x2 = this.getReferencePoint(sling).x;
 		y2 = this.getReferencePoint(sling).y;
