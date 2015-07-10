@@ -73,8 +73,8 @@ public class SceneClassifier {
 		bloques.addAll(Scene.Blocks);
 
 
-		//        List<ABObject> construciones = new LinkedList<ABObject>();
-		//        construciones.addAll(Scene.Blocks);
+		//List<ABObject> construciones = new LinkedList<ABObject>();
+		//construciones.addAll(Scene.Blocks);
 		//construciones.addAll(Scene.Hills);
 
 		Scene.ObstructedPigs = new LinkedList<ABObject>();

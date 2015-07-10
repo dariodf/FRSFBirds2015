@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import tori.heuristics.BestShoot;
 import tori.heuristics.SceneClassifier;
 import tori.heuristics.SceneState;
 import ab.demo.other.ClientActionRobot;
@@ -202,7 +203,8 @@ public class ClientNaiveAgent implements Runnable {
 	public GameState solve()
 	{
 
-		boolean highShoot = false;
+		boolean highShoot;
+		boolean CircularFirstShoot;
 
 		// capture Image
 		BufferedImage screenshot = ar.doScreenShot();
@@ -210,7 +212,8 @@ public class ClientNaiveAgent implements Runnable {
 		// process image
 		Vision vision = new Vision(screenshot);
 
-		this.percibirElementosDeLaEscena(vision);
+		new SceneClassifier().Identify(Scene, vision, ar);
+		//this.percibirElementosDeLaEscena(vision);
 
 
 		//If the level is loaded (in PLAYINGã€€state)but no slingshot detected, then the agent will request to fully zoom out.
@@ -244,31 +247,17 @@ public class ClientNaiveAgent implements Runnable {
 				/**********************************************/
 
 				//TODO ¿REGLAS? Por las cuales se seleccionará el target. De momento, se selecciona un cerdo,
-				//deberia de considerarse q el target puede llegar a ser una estructura o punto arbitrario
-				Point target;
-
-
-				ABObject pig = new ABObject();
-
-				if(!this.Scene.FreePigs.isEmpty())
-					pig = this.Scene.FreePigs.get(0);
-				else if(!this.Scene.ObstructedPigs.isEmpty()){
-					pig = this.Scene.ObstructedPigs.get(0);
-					highShoot = true;
-				}
-				else if(!this.Scene.PigsInBuildings.isEmpty())
-					pig = this.Scene.PigsInBuildings.get(0);
-				else 
-					System.out.println("NO ENCONTRO OBJETO PARA DISPARA");
-
-				System.out.println("##### PREPARANDO DISPARO #####");
-				System.out.println("Seleccionado Chancho[" + this.Scene.Pigs.indexOf(pig) + "] en la pos: ( " + pig.x + ", " + pig.y + " )");
-				System.out.println();
-
+				//deberia de considerarse q el target puede llegar a ser una estructura o punto arbitrario			
 
 				//TODO SELECION DE PUNTO A DONDE DISPARA
-				target = pig.getCenter();
+				System.out.println("##### PREPARANDO DISPARO #####");
+				BestShoot bs = new BestShoot();
+				Point target = bs.getTarget(this.Scene);
+				System.out.println("Target Point: " + target.toString());
+				highShoot = bs.isHighShoot();
+				CircularFirstShoot = bs.isCircularFirstShoot();
 
+				System.out.println("Target :" + target.toString());
 				// if the target is very close to before, randomly choose a
 				// point near it
 				if (this.Scene.prevTarget != null && distance(this.Scene.prevTarget, target) < 10) {
@@ -300,28 +289,13 @@ public class ClientNaiveAgent implements Runnable {
 					System.out.println("Release Point: " + releasePoint);
 					System.out.println("Release Angle: " + Math.toDegrees(releaseAngle));
 
-					/*		int tapInterval = 0;					
+					//Segundo CLick por prorcentaje de distacia recorrida
+					//int tapInterval = bs.getTapTime(this.Scene);
+					//tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, target, tapInterval);
 
-					switch (this.Scene.BirdOnSling) 
-					{
-						case RedBird:
-							tapInterval = 0; break;               // start of trajectory
-						case YellowBird:
-							tapInterval = 65 + randomGenerator.nextInt(25);break; // 65-90% of the way
-						case WhiteBird:
-							tapInterval =  50 + randomGenerator.nextInt(20);break; // 50-70% of the way
-						case BlackBird:
-							tapInterval =  0;break; // 70-90% of the way
-						case BlueBird:
-							tapInterval =  65 + randomGenerator.nextInt(20);break; // 65-85% of the way
-						default:
-							tapInterval =  60;
-					}
-					tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, _tpt, tapInterval);
-					 */
-
-					Point tapPoint = new Point(target.x, target.y);
-					tapTime = tp.getTapTimeFromPoint(this.Scene.Sling, releasePoint, target, tapPoint);
+					
+					//Segundo CLick en punto exacto
+					//Point tapPoint = new Point(target.x, target.y);
 
 				} else {
 					System.err.println("No Release Point Found");
