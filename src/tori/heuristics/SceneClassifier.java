@@ -64,7 +64,7 @@ public class SceneClassifier {
 				Scene.CircularBlocks.add(b);
 			}
 		}
-
+		tori.utils.Logger.Print(Scene.toString());
 		System.out.println(Scene.toString());
 	}
 
