@@ -98,20 +98,20 @@ public class SceneState
     	String result = "##### DATOS DEL ESCENARIO #####\n";
     	result += "---------Chanchos------------------------\n";
     	result += " # Total: " + this.Pigs.size() + ".\n";
-        result += " # En Construcción: " + this.PigsInBuildings.size() + ".\n";
-        result += " # Chanchos Obstruidos: " + this.ObstructedPigs.size() + ".\n";
-        result += " # Chanchos Libres: " + this.FreePigs.size() + ".\n";
+        result += (this.PigsInBuildings.size() > 0) ? "# En Construcción: " + this.PigsInBuildings.size() + ".\n" : "";
+        result += (this.ObstructedPigs.size() > 0) ?" # Chanchos Obstruidos: " + this.ObstructedPigs.size() + ".\n": "";
+        result += (this.FreePigs.size() > 0) ?" # Chanchos Libres: " + this.FreePigs.size() + ".\n" : "";
         
         result += "---------Bloques-------------------------\n";
         result += " # Total: " + this.Blocks.size() + ".\n";
-        result += " # Circulares: " + this.CircularBlocks.size() + ".\n";
+        result += (this.CircularBlocks.size() > 0) ? " # Circulares: " + this.CircularBlocks.size() + ".\n" : "";
         
         result += "---------Construcciones------------------\n";
         
         result += " # Total: " + ( this.Buildings.size() + this.FreeBuildings.size() ) + ". (2 o más bloques)\n";
-        result += " # Con chanchos dentro: " + this.Buildings.size() + ".\n";
-        result += " # Sin chanchos dentro: " + this.FreeBuildings.size() + ".\n";
-        
+        result += (this.Buildings.size() > 0 ) ? " # Con chanchos dentro: " + this.Buildings.size() + ".\n" : "";
+        result += (this.FreeBuildings.size() > 0) ? " # Sin chanchos dentro: " + this.FreeBuildings.size() + ".\n" : "";
+        if(( this.Buildings.size() + this.FreeBuildings.size()) >0){
         result += "---------Tipos de Construcciones---------\n";
         
         int HoC = 0,
@@ -134,22 +134,26 @@ public class SceneState
         			break;
         	}
 		}
-        result += " # House of Cards: " + HoC + "\n";
-        result += " # Bunkers: " + Bkr + "\n";
-        result += " # Tower: " + Twr + "\n";
-        
+        result += (HoC > 0) ? " # House of Cards: " + HoC + "\n" : "";
+        result += (Bkr > 0) ? " # Bunkers: " + Bkr + "\n" : "";
+        result += (Twr > 0) ? " # Tower: " + Twr + "\n" : "";
+        }
         result += "---------Pájaros-------------------------\n";
         
         result += " # Total: " + this.Birds.size() + ".\n";
         result += " # En la resortera: " + this.BirdOnSling.toString() + ".\n"; 
         
-        result += "---------Colinas-------------------------\n";
+        if(this.Hills.size() >0){
+        	result += "---------Colinas-------------------------\n";
+            
+            result += " # Total: " + this.Hills.size() + ".\n";
+        }
         
-        result += " # Total: " + this.Hills.size() + ".\n";
-        
-        result += "---------TNTs----------------------------\n";
-        
-        result += " # Total: " + this.TNTs.size() + ".\n";
+        if(this.TNTs.size() > 0){
+        	result += "---------TNTs----------------------------\n";
+            
+            result += " # Total: " + this.TNTs.size() + ".\n";
+        }
     	return result;
     }
     
