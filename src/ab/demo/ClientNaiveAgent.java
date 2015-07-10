@@ -21,7 +21,6 @@ import tori.heuristics.SceneState;
 import ab.demo.other.ClientActionRobot;
 import ab.demo.other.ClientActionRobotJava;
 import ab.planner.TrajectoryPlanner;
-import ab.vision.ABObject;
 import ab.vision.GameStateExtractor.GameState;
 import ab.vision.Vision;
 //Naive agent (server/client version)
@@ -31,7 +30,7 @@ public class ClientNaiveAgent implements Runnable {
 
 	//Wrapper of the communicating messages
 	private ClientActionRobotJava ar;
-	public byte currentLevel = 0; // TODO: UNO MENOS DEL NIVEL QUE QUEREMOS
+	public byte currentLevel = 7; // TODO: UNO MENOS DEL NIVEL QUE QUEREMOS
 	public int failedCounter = 0;
 	public int[] solved;
 	TrajectoryPlanner tp; 
@@ -126,7 +125,8 @@ public class ClientNaiveAgent implements Runnable {
 	public void run() {	
 		byte[] info = ar.configure(ClientActionRobot.intToByteArray(id));
 		solved = new int[info[2]];
-
+		BestShoot bs = new BestShoot();
+		
 		//load the initial level (default 1)
 		//Check my score
 		//checkMyScore();
@@ -136,7 +136,7 @@ public class ClientNaiveAgent implements Runnable {
 		GameState state;
 		while (true) {
 
-			state = solve();
+			state = solve(bs);
 
 			System.out.println();
 			//If the level is solved , go to the next level
@@ -171,7 +171,9 @@ public class ClientNaiveAgent implements Runnable {
 					}
 					else
 					{		
-						System.out.println("restart");
+						System.out.println("###########################################");
+						System.out.println("=> RESTART THE LEVEL " + (currentLevel + 1) );
+						System.out.println("###########################################");
 						ar.restartLevel();
 					}
 
@@ -198,13 +200,14 @@ public class ClientNaiveAgent implements Runnable {
 
 	/** 
 	 * Solve a particular level by shooting birds directly to pigs
+	 * @param bs 
 	 * @return GameState: the game state after shots.
 	 */
-	public GameState solve()
+	public GameState solve(BestShoot bs)
 	{
 
 		boolean highShoot;
-		boolean CircularFirstShoot;
+		//boolean CircularFirstShoot;
 
 		// capture Image
 		BufferedImage screenshot = ar.doScreenShot();
@@ -251,21 +254,20 @@ public class ClientNaiveAgent implements Runnable {
 
 				//TODO SELECION DE PUNTO A DONDE DISPARA
 				System.out.println("##### PREPARANDO DISPARO #####");
-				BestShoot bs = new BestShoot();
+				
 				Point target = bs.getTarget(this.Scene);
 				System.out.println("Target Point: " + target.toString());
 				highShoot = bs.isHighShoot();
-				CircularFirstShoot = bs.isCircularFirstShoot();
+				//CircularFirstShoot = bs.isCircularFirstShoot();
 
-				System.out.println("Target :" + target.toString());
 				// if the target is very close to before, randomly choose a
 				// point near it
-				if (this.Scene.prevTarget != null && distance(this.Scene.prevTarget, target) < 10) {
+				/*if (this.Scene.prevTarget != null && distance(this.Scene.prevTarget, target) < 10) {
 					double _angle = randomGenerator.nextDouble() * Math.PI * 2;
 					target.x = target.x + (int) (Math.cos(_angle) * 10);
 					target.y = target.y + (int) (Math.sin(_angle) * 10);
-					System.out.println("Randomly changing to " + target);
-				}
+					System.out.println("[Correction] New Target Point " + target);
+				}*/
 
 				this.Scene.prevTarget = new Point(target.x, target.y);
 
@@ -290,8 +292,8 @@ public class ClientNaiveAgent implements Runnable {
 					System.out.println("Release Angle: " + Math.toDegrees(releaseAngle));
 
 					//Segundo CLick por prorcentaje de distacia recorrida
-					//int tapInterval = bs.getTapTime(this.Scene);
-					//tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, target, tapInterval);
+					int tapInterval = bs.getTapTime(this.Scene);
+					tapTime = tp.getTapTime(this.Scene.Sling, releasePoint, target, tapInterval);
 
 					
 					//Segundo CLick en punto exacto
@@ -345,6 +347,7 @@ public class ClientNaiveAgent implements Runnable {
 	 * Obtiene todos los elementos que posee la pantalla actual, y lo guarda en Scene.
 	 * @param vision
 	 */
+	@SuppressWarnings({ "unused" })
 	private void percibirElementosDeLaEscena(Vision vision) {
 
 		/// TODO: Si se necesitan los otros objetos en la pantalla Descomentar las lineas necesarias.

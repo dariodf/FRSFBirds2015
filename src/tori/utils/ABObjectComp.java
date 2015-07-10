@@ -9,10 +9,6 @@
  *****************************************************************************/
 package tori.utils;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Area;
-import java.util.List;
 import java.util.Comparator;
 
 import ab.vision.ABObject;	
@@ -40,20 +36,6 @@ public  class ABObjectComp implements Comparator<ABObject>
 		*	true = width, false = height	
 	 	*/
 	 	private boolean width;
-	 	/**
-		*	Sets the comparator so that it will sort by the x coordinate.
-	 	*/	
-	 	private void sortByX()
-	 	{
-	 		type = true;	
-	 	}
-	 	/**
-		*	Sets the comparator so that it will sort by the y coordinate.
-	 	*/	 	
-	 	private void sortByY()
-	 	{
-	 		type = false;
-	 	}
 	 	/**
 		*	Sets the comparator so that it will sort by ascending order.
 	 	*/

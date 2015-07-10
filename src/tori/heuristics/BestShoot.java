@@ -24,7 +24,7 @@ public class BestShoot {
 			System.out.println("** DISPARO A TNT **");
 			targetObj = scene.TNTs.get(0);
 		}
-		else if(!scene.CircularBlocks.isEmpty()) {// aqui deberia ir un controlador que si ya tiro a la piedra circular no vuelva a tirar, pero por alguna razon anda sin el
+		else if(!scene.CircularBlocks.isEmpty() && CircularFirstShoot) {
 			System.out.println("** DISPARO A PIEDRA CIRCULAR **");
 			targetObj = scene.CircularBlocks.get(0);
 			CircularFirstShoot = false;
@@ -45,10 +45,10 @@ public class BestShoot {
 				targetObj = scene.PigsInBuildings.get(0);
 			} else if(scene.Buildings.get(0).GetBuildingType() == "Tower"){
 				msj += "Tower **";
-				int sup = scene.Buildings.get(0).getBoundingRect().y;
-				int der = scene.Buildings.get(0).getBoundingRect().x + scene.Buildings.get(0).getBoundingRect().width;
+				int x = scene.Buildings.get(0).getBoundingRect().x + (scene.Buildings.get(0).getBoundingRect().width/2);
+				int y = (int) (scene.Buildings.get(0).getBoundingRect().y + (scene.Buildings.get(0).getBoundingRect().height*(0.2)));
 				
-				tower = new Point(der, sup);
+				tower = new Point(x, y);
 				
 			} else if(scene.Buildings.get(0).GetBuildingType() == "Bunker"){
 				msj += "Bunker **";
@@ -82,13 +82,13 @@ public class BestShoot {
 			case YellowBird:
 				tapInterval = 65; break; // 65-90% of the way
 			case WhiteBird:
-				tapInterval =  90; break; // 50-70% of the way
+				tapInterval = 90; break; // 50-70% of the way
 			case BlackBird:
-				tapInterval =  0;break; // 70-90% of the way
+				tapInterval = 0;break; // 70-90% of the way
 			case BlueBird:
-				tapInterval =  90;break; // 65-85% of the way
+				tapInterval = 90;break; // 65-85% of the way
 			default:
-				tapInterval =  50;
+				tapInterval = 50;
 		}
 		
 		return tapInterval;
