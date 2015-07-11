@@ -6,10 +6,12 @@ package tori.heuristics;
 import java.awt.Rectangle;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import tori.utils.ABObjectComp;
 import tori.utils.Building;
 import tori.utils.Bunker;
 import tori.utils.HouseOfCards;
@@ -64,6 +66,22 @@ public class SceneClassifier {
 				Scene.CircularBlocks.add(b);
 			}
 		}
+		System.out.println("bloques with circular: "  + Scene.Blocks.size());
+		Scene.Blocks.removeAll(Scene.CircularBlocks);
+		System.out.println("bloques without circular: "  + Scene.Blocks.size());
+		ABObjectComp comparator = new ABObjectComp();
+        comparator.sortByWidth();
+        comparator.sortDesc();
+        Collections.sort(Scene.CircularBlocks, comparator);
+        
+		System.out.println("\n##### PIEDRAS CIRCULARES #####");
+		for (ABObject p : Scene.CircularBlocks) {
+			System.out.println("piedra: Diametro:" + p.getWidth() + "  Posicion: ( "+ p.x + ", " + p.y + ")");
+		}
+		System.out.println();
+
+
+
 		tori.utils.Logger.Print(Scene.toString());
 		System.out.println(Scene.toString());
 	}
@@ -141,6 +159,7 @@ public class SceneClassifier {
 		List<ABObject> tobevisited= new ArrayList<ABObject>(objs);
 		List<Building> boundingboxes = new ArrayList<Building> ();
 
+		tori.utils.Logger.Print("##### DATOS DE LAS CONSTRUCCIONES #####");
 		System.out.println("##### DATOS DE LAS CONSTRUCCIONES #####");
 		while(tobevisited.size() != 0){
 			Building b = FindBuilding(tobevisited);
@@ -148,6 +167,7 @@ public class SceneClassifier {
 				boundingboxes.add(b);
 
 		}
+		tori.utils.Logger.Print("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSRUCCIONES.\n");
 		System.out.println("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSRUCCIONES.\n");
 		return boundingboxes;
 	}
@@ -206,7 +226,7 @@ public class SceneClassifier {
 			}
 
 		}
-
+		tori.utils.Logger.Print(result.toString());
 		System.out.println(result.toString());
 		return result;
 	}

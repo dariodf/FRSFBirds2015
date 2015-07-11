@@ -39,6 +39,7 @@ public class ClientActionRobot {
 			// 1. creating a socket to connect to the server
 			requestSocket = new Socket(_ip, 2004);
 			requestSocket.setReceiveBufferSize(100000);
+			tori.utils.Logger.Print("Connected to " + _ip + " in port 2004");
 			System.out.println("Connected to " + _ip + " in port 2004");
 			out = requestSocket.getOutputStream();
 			out.flush();

@@ -1,5 +1,8 @@
 package ab.demo;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+
 import ab.planner.abTrajectory;
 import ab.utils.GameImageRecorder;
 import ab.vision.ShowSeg;
@@ -17,6 +20,14 @@ public class MainEntry {
 	// the entry of the software.
 	public static void main(String args[])
 	{
+		/* IMPRIME EL TIMESTUMP PARA DEBUGG */
+		Calendar cal = Calendar.getInstance();
+	    DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL,
+	        DateFormat.MEDIUM);
+
+	    tori.utils.Logger.Print(df.format(cal.getTime()));
+	    System.out.println(df.format(cal.getTime()));
+		
 		String command = "";
 		if(args.length > 0)
 		{
