@@ -1,5 +1,7 @@
 package tori.heuristics;
 
+import ab.vision.ABObject;
+import tori.utils.Building;
 import java.awt.Point;
 
 public class BestShoot {
@@ -34,9 +36,9 @@ public class BestShoot {
 		}
 		else if(!scene.PigsInBuildings.isEmpty()){
 			String msj = "** DISPARO A BUILDING PIG EN ";
-			if(scene.Buildings.get(0).GetBuildingType() == "House of Cards"){
+			if(scene.Buildings.get(0).GetBuildingType() == "House of Cards" && getHouseOfCardsTarget(scene) != null){
 				msj += "HOUSE OF CARDS **";
-				targetObj = scene.PigsInBuildings.get(0).getCenter();
+				targetObj = getHouseOfCardsTarget(scene);
 			} else if(scene.Buildings.get(0).GetBuildingType() == "Tower"){
 				msj += "TOWER **";
 				int x = scene.Buildings.get(0).getBoundingRect().x;
@@ -77,6 +79,35 @@ public class BestShoot {
 		
 	}
 	
+	public Point getHouseOfCardsTarget(SceneState scene)
+	{
+		ABObject nearestBelow = scene.Buildings.get(0).findLeftDownBlock();
+		while (nearestBelow.height <= nearestBelow.width) // Busca el primer bloque más vertical que horizontal de la izquierda para no tomar como objetivo un bloque que sea parte del piso de la estructura. Usa <= porque como compara el rectángulo, el bloque puede ser cuadrado o redondo y no queremos atacar esos.
+			nearestBelow = nearestBelow.findNearestAbove(scene.Blocks);
+		if (nearestBelow == null) return null; 
+		switch (scene.BirdOnSling) 
+		{
+			case RedBird: // Busca el primer horizontal desde la izquierda que esté sobre un bloque más vertical que horizontal.
+				while (nearestBelow.width <= nearestBelow.height) // Itera hasta encontrar el primer bloque horizontal desde abajo hacia arriba.
+					 nearestBelow = nearestBelow.findNearestAbove(scene.Blocks);
+				if (nearestBelow == null) return null;
+				return new Point(nearestBelow.x, nearestBelow.y + nearestBelow.height/2); // Retorna el punto medio de la cara izquierda del ABObject. Nota: No funciona con diagonales. TODO: Recorrer con for y devolver la lista de puntos para todos los bloques horizontales sobre un vertical del lado izquierdo de la construcción para que pruebe con el siguiente si pierde el nivel.
+			// case YellowBird:
+			// 	break; // TODO
+			// case WhiteBird:
+			// 	break; // TODO
+			// case BlackBird:
+			// 	break; // TODO
+			// case BlueBird:
+			// 	break; // TODO
+			default: // Por el momento, todos hacen lo mismo que el rojo.
+				while (nearestBelow.width <= nearestBelow.height) // Itera hasta encontrar el primer bloque horizontal desde abajo hacia arriba.
+					 nearestBelow = nearestBelow.findNearestAbove(scene.Blocks);
+				if (nearestBelow == null) return null;	 
+				return new Point(nearestBelow.x, nearestBelow.y + nearestBelow.height/2); // Retorna el punto medio de la cara izquierda del ABObject. Nota: No funciona con diagonales. TODO: Recorrer con for y devolver la lista de puntos para todos los bloques horizontales sobre un vertical del lado izquierdo de la construcción para que pruebe con el siguiente si pierde el nivel.
+		}
+	}
+
 	public int getTapTime(SceneState scene){
 		int tapInterval = 0;					
 		

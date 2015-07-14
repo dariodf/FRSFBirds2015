@@ -50,8 +50,10 @@ public class SceneClassifier {
 		temp = vision.findTNTs();
 		Scene.TNTs = (temp != null) ? temp : new LinkedList<ABObject>(); // TNTs
 
-		Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
+		// Original:
+		// Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
 
+		Scene.BirdOnSling = Scene.Birds.remove(0).getType();
 
 		//Scene.Buildings = Building.FindBuildings(Scene); // Construcciones con chanchos
 		List<Building> buildings = FindBuildings(Scene.Blocks);
@@ -61,8 +63,15 @@ public class SceneClassifier {
 
 		// TODO: Ver en que clase agregar esto....
 		Scene.CircularBlocks.clear();
+		double radMax =0;
+		for (ABObject b : Scene.Blocks) 
+		{
+			if (b.shape == ABShape.Circle && b.width/2 > radMax) { // Buscamos el radio más grande para luego omitir las piedras chiquitas.
+				radMax = b.width/2;
+			}
+		}
 		for (ABObject b : Scene.Blocks) {
-			if (b.shape == ABShape.Circle) {
+			if (b.shape == ABShape.Circle && b.width/2 >= radMax*0.9) { // Agregamos las piedras grandes. Le puse >=0.9r porque son doubles y es raro que den igual. 
 				Scene.CircularBlocks.add(b);
 			}
 		}
@@ -84,6 +93,11 @@ public class SceneClassifier {
 
 		tori.utils.Logger.Print(Scene.toString());
 		System.out.println(Scene.toString());
+	}
+
+	public void setBirds(SceneState Scene, ClientActionRobotJava ar)
+	{
+		Scene.Birds = ar.getListOfBirds();
 	}
 
 	private void ClassifyBuildingsAndPigs(SceneState Scene, List<Building> buildings) {
@@ -211,8 +225,8 @@ public class SceneClassifier {
 	 */
 	public Building ClasifyBuilding( List<ABObject> total){
 		Building result = new Building(total); 
-
-		if(result.Densidad() < 0.39 || result.blocks.size() < 4){
+	
+		if(result.Densidad() < 0.39 || (result.blocks.size() < 4 && result.blocks.size() > 1)){ // Si la densidad es menor o tiene 2 o 3 elementos y el elemento de arriba de todo es horizontal o cuadrado o redondo, entonces:
 			result = new HouseOfCards(result);
 		}
 		else {

@@ -254,6 +254,25 @@ public class ActionRobot {
 		return _birds.get(0).getType();
 	}
 
+	public List<ABObject> getListOfBirds()
+	{
+		fullyZoomIn();
+		BufferedImage screenshot = doScreenShot();
+		Vision vision = new Vision(screenshot);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+		}
+		fullyZoomOut();
+		List<ABObject> _birds = vision.findBirdsMBR();
+		return _birds;
+	}	
+
+
+
+
 	public static void main(String args[]) {
 
 		long time = System.currentTimeMillis();

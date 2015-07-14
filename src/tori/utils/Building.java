@@ -111,7 +111,7 @@ public class Building
 	/**
 	*	Finds the top left corner of the building which is later stored in x and y
 	*/
-	private ABObject findLeftDownBlock()
+	public ABObject findLeftDownBlock()
 	{
 		Point tmp = new Point(0,0);
 		
@@ -1169,16 +1169,4 @@ public boolean tieneNBloquesAlineados ( int N){
 	}
 	return result;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 }

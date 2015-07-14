@@ -134,9 +134,12 @@ public class ClientNaiveAgent implements Runnable {
 		currentLevel = (byte)getNextLevel(); 
 		ar.loadLevel(currentLevel);
 		GameState state;
+		new SceneClassifier().setBirds(Scene, ar);
+		ar.fullyZoomOut();
 		while (true) {
 			
 			state = solve(bs);
+
 
 			System.out.println();
 			//If the level is solved , go to the next level
@@ -218,6 +221,10 @@ public class ClientNaiveAgent implements Runnable {
 	{
 
 		boolean highShoot = false;
+
+
+		// hace zoomOut desde el principio para no perder tiempo.
+		
 
 		// capture Image
 		BufferedImage screenshot = ar.doScreenShot();
@@ -320,7 +327,6 @@ public class ClientNaiveAgent implements Runnable {
 
 
 				// check whether the slingshot is changed. the change of the slingshot indicates a change in the scale.
-				ar.fullyZoomOut();
 				screenshot = ar.doScreenShot();
 				vision = new Vision(screenshot);
 				Rectangle _sling = vision.findSlingshotMBR();
