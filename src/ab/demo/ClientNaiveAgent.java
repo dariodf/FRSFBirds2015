@@ -30,7 +30,7 @@ public class ClientNaiveAgent implements Runnable {
 
 	//Wrapper of the communicating messages
 	private ClientActionRobotJava ar;
-	public byte currentLevel = 0; // TODO: UNO MENOS DEL NIVEL QUE QUEREMOS
+	public byte currentLevel = 10; // TODO: UNO MENOS DEL NIVEL QUE QUEREMOS
 	public int failedCounter = 0;
 	public int[] solved;
 	TrajectoryPlanner tp; 
@@ -134,6 +134,7 @@ public class ClientNaiveAgent implements Runnable {
 		currentLevel = (byte)getNextLevel(); 
 		ar.loadLevel(currentLevel);
 		GameState state;
+		ar.fullyZoomIn();
 		new SceneClassifier().setBirds(Scene, ar);
 		ar.fullyZoomOut();
 		while (true) {

@@ -102,7 +102,6 @@ public class ClientActionRobotJava extends ClientActionRobot {
 
 	public List<ABObject> getListOfBirds()
 	{
-		fullyZoomIn();
 		BufferedImage screenshot = doScreenShot();
 		Vision vision = new Vision(screenshot);
 		try {

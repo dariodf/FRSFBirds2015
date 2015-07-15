@@ -53,10 +53,16 @@ public class SceneClassifier {
 		// Original:
 		// Scene.BirdOnSling = ar.getBirdTypeOnSling(); // BirdType on Sling
 
-		Scene.BirdOnSling = Scene.Birds.remove(0).getType();
-
+		try 
+		{
+			Scene.BirdOnSling = Scene.Birds.remove(0).getType();
+		} 
+		catch (Exception name) 
+		{}
+		
 		//Scene.Buildings = Building.FindBuildings(Scene); // Construcciones con chanchos
-		List<Building> buildings = FindBuildings(Scene.Blocks);
+		List<Building> buildings1 = FindBuildings(Scene.Blocks);
+		List<Building> buildings = SeparateBuildings(buildings1);
 		Scene.Buildings = new LinkedList<Building>();
 		Scene.FreeBuildings = new LinkedList<Building>();
 		this.ClassifyBuildingsAndPigs(Scene, buildings);
@@ -134,7 +140,7 @@ public class SceneClassifier {
 			}
 
 		}
-
+		
 		for (int i = 0; i < buildings.size(); i++) {
 			Rectangle buildingBoundary = buildings.get(i).bounding;
 			if(buildingBoundary == null)
@@ -163,6 +169,116 @@ public class SceneClassifier {
 	}
 
 
+	// Para cada building, prueba sacar un elemento y ver si eso genera dos buildings.
+	public List<Building> SeparateBuildings (List<Building> buildings)
+	{
+		List<Building> result = new ArrayList<Building> ();
+		boolean separated;
+
+		tori.utils.Logger.Print("##### DATOS DE LAS CONSTRUCCIONES DESPUES DE SEPARAR #####");
+		System.out.println("##### DATOS DE LAS CONSTRUCCIONES DESPUES DE SEPARAR #####");
+
+		for (int i = 0; i < buildings.size(); i++)
+		{
+			separated = false;
+			if (buildings.get(i).blocks.size() > 5) // No vale la pena si son buildings chicos
+			for (int j = 0; j < buildings.get(i).blocks.size(); j++)
+			{
+				List<ABObject> tempBlocks = new ArrayList<ABObject>(buildings.get(i).blocks);
+				tempBlocks.remove(j); // Antes de esto se podría buscar algún filtro para estos bloques, como por ejemplo que soporten por lo menos dos elementos o cosas así, para no tener que probar con todos.
+				List<Building> tempBuildings = FindBuildingsInSilence(tempBlocks);
+				if (tempBuildings.size() == 2 && ((tempBuildings.get(0).blocks.size() > 5 && tempBuildings.get(1).blocks.size() > 3) || (tempBuildings.get(0).blocks.size() > 3 && tempBuildings.get(1).blocks.size() > 5))) // Si al quitar el bloque y volver a analizar obtenemos dos buildings con al menos uno importante, entonces:
+				{
+					result.add(tempBuildings.get(0)); 
+					tori.utils.Logger.Print(tempBuildings.get(0).toString());
+					System.out.println(tempBuildings.get(0).toString());
+					
+					result.add(tempBuildings.get(1));
+					tori.utils.Logger.Print(tempBuildings.get(1).toString());
+					System.out.println(tempBuildings.get(1).toString());
+					separated = true;
+					break;
+				}
+			}
+			if (!separated && buildings.get(i).blocks.size() > 1)
+			{
+				result.add(buildings.get(i));
+				tori.utils.Logger.Print(buildings.get(i).toString());
+				System.out.println(buildings.get(i).toString());
+			}
+		}
+		tori.utils.Logger.Print("\nSE HAN ENCONTRADO " + result.size() + " CONSTRUCCIONES.\n");
+		System.out.println("\nSE HAN ENCONTRADO " + result.size() + " CONSTRUCCIONES.\n");
+		return result;
+	}
+
+
+	public List<Building> FindBuildingsInSilence (List<ABObject> objs) 
+	{ // Hace lo mismo pero sin mostrar los mensajes.
+		List<ABObject> tobevisited= new ArrayList<ABObject>(objs);
+		List<Building> boundingboxes = new ArrayList<Building> ();
+
+
+		while(tobevisited.size() != 0){
+			Building b = FindBuildingInSilence(tobevisited);
+			if(b.blocks.size() > 1)
+				boundingboxes.add(b);
+
+		}
+
+		return boundingboxes;
+	}
+
+	private Building FindBuildingInSilence( List<ABObject> blocks){
+
+		Queue<ABObject> fronta = new ArrayDeque<ABObject> ();
+		List<ABObject> total = new ArrayList<ABObject> ();
+
+		fronta.add(blocks.get(0));
+		blocks.remove(0);
+
+		while(fronta.size() != 0)
+		{
+			ABObject tmp = fronta.poll();
+			total.add(tmp);
+
+			for (int i=0;i<blocks.size();++i)
+			{
+				if (tmp.touches(blocks.get(i) ) )
+				{
+					fronta.add(blocks.get(i));
+					blocks.remove(i);  
+					--i;
+				}
+			}
+		}
+		Building bld =  ClasifyBuildingInSilence(total);
+		return bld;
+	}	
+
+	public Building ClasifyBuildingInSilence( List<ABObject> total){
+		Building result = new Building(total); 
+	
+		if(result.Densidad() < 0.39 || (result.blocks.size() < 4 && result.blocks.size() > 1)){ // Si la densidad es menor o tiene 2 o 3 elementos y el elemento de arriba de todo es horizontal o cuadrado o redondo, entonces:
+			result = new HouseOfCards(result);
+		}
+		else {
+			Rectangle boundary = result.getBoundingRectTWO();
+			//				System.out.println("Alto: " + boundary.height + ">= Ancho: " + boundary.width  + " * 1.3\n");
+			if(boundary.height >= (boundary.width * 1.3)){
+				result = new Tower(result);
+			}
+			else{
+				result = new Bunker(result);
+			}
+
+		}
+		return result;
+	}
+
+
+
+
 	/**
 	 * Dado una lista de bloques, se busca si existen construcciones.
 	 * @param blocks Listado de bloques que fueron identificados en la pantalla.
@@ -181,8 +297,10 @@ public class SceneClassifier {
 				boundingboxes.add(b);
 
 		}
-		tori.utils.Logger.Print("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSRUCCIONES.\n");
-		System.out.println("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSRUCCIONES.\n");
+		tori.utils.Logger.Print("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSTRUCCIONES.\n");
+		System.out.println("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSTRUCCIONES.\n");
+
+
 		return boundingboxes;
 	}
 

@@ -256,7 +256,6 @@ public class ActionRobot {
 
 	public List<ABObject> getListOfBirds()
 	{
-		fullyZoomIn();
 		BufferedImage screenshot = doScreenShot();
 		Vision vision = new Vision(screenshot);
 		try {

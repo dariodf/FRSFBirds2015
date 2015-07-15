@@ -925,8 +925,8 @@ public class Building
         		boundingboxes.add(b);
  
         }
-        tori.utils.Logger.Print("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSRUCCIONES.\n");
-        System.out.println("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSRUCCIONES.\n");
+        tori.utils.Logger.Print("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSTRUCCIONES.\n");
+        System.out.println("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSTRUCCIONES.\n");
         return boundingboxes;
     }
 	/**
