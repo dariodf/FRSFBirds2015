@@ -200,13 +200,12 @@ public class VisionRealShape
           comparator.sortDesc();
           Collections.sort(pigs, comparator);
           
-          tori.utils.Logger.Print("\n##### DATOS DE LOS CHANCHOS #####");
-          System.out.println("\n##### DATOS DE LOS CHANCHOS #####");
+          //tori.utils.Logger.Print("##### DATOS DE LOS CHANCHOS #####");
+          System.out.println("##### DATOS DE LOS CHANCHOS #####");
           for (ABObject p : pigs) {
-        	  tori.utils.Logger.Print("chancho: Diametro:" + p.getWidth() + "  Posicion: ( "+ p.x + ", " + p.y + ")");
+        	  //tori.utils.Logger.Print("chancho: Diametro:" + p.getWidth() + "  Posicion: ( "+ p.x + ", " + p.y + ")");
         	  System.out.println("chancho: Diametro:" + p.getWidth() + "  Posicion: ( "+ p.x + ", " + p.y + ")");
           }
-          tori.utils.Logger.Print("\n");
           System.out.println();
           return pigs;
     }

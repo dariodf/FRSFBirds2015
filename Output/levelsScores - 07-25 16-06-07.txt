@@ -1,0 +1,72 @@
+
+
+Nivel: 1
+29380
+
+Nivel: 2
+51700
+
+Nivel: 3
+0
+
+Nivel: 4
+28770
+
+Nivel: 5
+ - Restart.
+57830
+
+Nivel: 6
+35550
+
+Nivel: 7
+22930
+
+Nivel: 8
+0
+
+Nivel: 9
+41610
+
+Nivel: 10
+ - Restart.
+46490
+
+Nivel: 11
+44190
+
+Nivel: 12
+55970
+
+Nivel: 13
+43650
+
+Nivel: 14
+0
+
+Nivel: 15
+0
+
+Nivel: 16
+47290
+
+Nivel: 17
+44550
+
+Nivel: 18
+ - Restart.
+42000
+
+Nivel: 19
+ - Restart.
+ - Restart.
+ - Restart.
+40950
+
+Nivel: 21
+69540
+
+Nivel: 1
+29380
+
+Nivel: 2

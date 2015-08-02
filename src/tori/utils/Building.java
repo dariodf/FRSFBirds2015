@@ -20,16 +20,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+
+
+
+
 import tori.heuristics.SceneState;
+import ab.demo.other.Shot;
 import ab.planner.TrajectoryPlanner;
 import ab.vision.ABObject;
+import ab.vision.ABShape;
 import ab.vision.ABType;
 import ab.vision.real.shape.Rect;
+import tori.utils.interfaces.IBuilding;
 
 /**
 *	This class encorporates the building structure. All the connected components are in the blocks variable.
 */
-public class Building
+public class Building implements IBuilding
 {
 	public List<ABObject> blocks;
     public int height;
@@ -39,6 +46,7 @@ public class Building
     public List<ABObject> leftPigs = new LinkedList<ABObject>();
     public List<ABObject> rightPigs = new LinkedList<ABObject>();
     public ABObject LeftBottomBlock;
+    public List<ABObject> circularBlocks = null;
 
     public List<Integer> distances = new LinkedList<Integer>();
 
@@ -62,7 +70,7 @@ public class Building
 		height = findHeight();
 		bounding = null;
 		this.LeftBottomBlock = this.findLeftDownBlock();
-		
+		this.GetCircularBlocks();
 		// test print
 //		System.out.println("Bloque de abajo a la izquierda: ");
 //		System.out.println("posicion(" + this.LeftBottomBlock.x + ", " + this.LeftBottomBlock.y + 
@@ -70,6 +78,21 @@ public class Building
 //		System.out.println();
 	}
 	
+
+	private List<ABObject> GetCircularBlocks() {
+		// TODO Auto-generated method stub
+		if(this.circularBlocks == null){
+			this.circularBlocks = new LinkedList<ABObject>();
+			for (ABObject abObject : blocks) {
+				if(abObject.shape == ABShape.Circle) {
+					this.circularBlocks.add(abObject);
+				}
+			}
+		}
+		
+		return this.circularBlocks;
+	}
+
 
 	/**
 	*	Returns the height of the building.
@@ -111,7 +134,7 @@ public class Building
 	/**
 	*	Finds the top left corner of the building which is later stored in x and y
 	*/
-	public ABObject findLeftDownBlock()
+	private ABObject findLeftDownBlock()
 	{
 		Point tmp = new Point(0,0);
 		
@@ -925,8 +948,8 @@ public class Building
         		boundingboxes.add(b);
  
         }
-        tori.utils.Logger.Print("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSTRUCCIONES.\n");
-        System.out.println("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSTRUCCIONES.\n");
+        //tori.utils.Logger.Print("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSRUCCIONES.\n");
+        System.out.println("\nSE HAN ENCONTRADO " + boundingboxes.size() + " CONSRUCCIONES.\n");
         return boundingboxes;
     }
 	/**
@@ -1008,66 +1031,66 @@ public class Building
 	 * @param Piggies
 	 * @return Lista de construcciones que fueron detectadas.
 	 */
-	public static List<Building> FindBuildings (SceneState Scene)
-    {
-		System.out.println(Scene.Sling.toString());
-		List<ABObject> bloques = new LinkedList<ABObject>();
-		bloques.addAll(Scene.Blocks);
-		
-        List<Building> result = FindBuildings(bloques);
-
-        List<ABObject> construciones = new LinkedList<ABObject>();
-        construciones.addAll(Scene.Blocks);
-        construciones.addAll(Scene.Hills);
-        
-        Scene.ObstructedPigs = new LinkedList<ABObject>();
-        Scene.FreePigs = new LinkedList<ABObject>();
-        Scene.PigsInBuildings = new LinkedList<ABObject>();
-        
-        
-        TrajectoryPlanner tp = new TrajectoryPlanner();
-        int obsPigs = 0, freePig = 0;
-        for (ABObject p : Scene.Pigs) {
-
-        	for(ABObject construccion : construciones)
-        		if(tp.trajectoriaObstruida(Scene.Sling, tp.estimateLaunchPoint(Scene.Sling, p.getCenter()), p.getCenter(), construccion)){
-        			Scene.ObstructedPigs.add(p);
-        			obsPigs++;
-        			break;
-        		} else {
-        			Scene.FreePigs.add(p);
-        			freePig++;
-        			break;
-        		}
-
-        }
-        
-        for (int i = 0; i < result.size(); i++) {
-        	Rectangle buildingBoundary = result.get(i).bounding;
-        	if(buildingBoundary == null)
-        		buildingBoundary = result.get(i).getBoundingRect();        		       		
-        	boolean havePig = false;
-        	for (int j = 0; j < Scene.ObstructedPigs.size(); j++) {
-        		if (Scene.ObstructedPigs.get(j).x >= buildingBoundary.x && Scene.ObstructedPigs.get(j).x <= buildingBoundary.x + buildingBoundary.width &&
-        				Scene.ObstructedPigs.get(j).y >= buildingBoundary.y && Scene.ObstructedPigs.get(j).y <= buildingBoundary.y + buildingBoundary.height ) {
-        			havePig = true;
-        			// Actualizo el SceneState con los chanchos que estan dentro de una construccion.
-        			Scene.PigsInBuildings.add(Scene.ObstructedPigs.get(j));
-        			Scene.ObstructedPigs.remove(j);
-				} 
-        	}
-        	
-        	if(!havePig){
-        		Scene.FreeBuildings.add(result.get(i));
-        		result.remove(i);
-        		i--;
-        	}
-		}
-        
-        System.out.println(construciones.size() + " - " + obsPigs + " - " + freePig);
-        
-        return result;
-    }
+//	public static List<Building> FindBuildings (SceneState Scene)
+//    {
+//		System.out.println(Scene.Sling.toString());
+//		List<ABObject> bloques = new LinkedList<ABObject>();
+//		bloques.addAll(Scene.Blocks);
+//		
+//        List<Building> result = FindBuildings(bloques);
+//
+//        List<ABObject> construciones = new LinkedList<ABObject>();
+//        construciones.addAll(Scene.Blocks);
+//        construciones.addAll(Scene.Hills);
+//        
+//        Scene.ObstructedPigs = new LinkedList<ABObject>();
+//        Scene.FreePigs = new LinkedList<ABObject>();
+//        Scene.PigsInBuildings = new LinkedList<ABObject>();
+//        
+//        
+//        TrajectoryPlanner tp = new TrajectoryPlanner();
+//        int obsPigs = 0, freePig = 0;
+//        for (ABObject p : Scene.Pigs) {
+//
+//        	for(ABObject construccion : construciones)
+//        		if(tp.trajectoriaObstruida(Scene.Sling, tp.estimateLaunchPoint(Scene.Sling, p.getCenter()), p.getCenter(), construccion)){
+//        			Scene.ObstructedPigs.add(p);
+//        			obsPigs++;
+//        			break;
+//        		} else {
+//        			Scene.FreePigs.add(p);
+//        			freePig++;
+//        			break;
+//        		}
+//
+//        }
+//        
+//        for (int i = 0; i < result.size(); i++) {
+//        	Rectangle buildingBoundary = result.get(i).bounding;
+//        	if(buildingBoundary == null)
+//        		buildingBoundary = result.get(i).getBoundingRect();        		       		
+//        	boolean havePig = false;
+//        	for (int j = 0; j < Scene.ObstructedPigs.size(); j++) {
+//        		if (Scene.ObstructedPigs.get(j).x >= buildingBoundary.x && Scene.ObstructedPigs.get(j).x <= buildingBoundary.x + buildingBoundary.width &&
+//        				Scene.ObstructedPigs.get(j).y >= buildingBoundary.y && Scene.ObstructedPigs.get(j).y <= buildingBoundary.y + buildingBoundary.height ) {
+//        			havePig = true;
+//        			// Actualizo el SceneState con los chanchos que estan dentro de una construccion.
+//        			Scene.PigsInBuildings.add(Scene.ObstructedPigs.get(j));
+//        			Scene.ObstructedPigs.remove(j);
+//				} 
+//        	}
+//        	
+//        	if(!havePig){
+//        		Scene.FreeBuildings.add(result.get(i));
+//        		result.remove(i);
+//        		i--;
+//        	}
+//		}
+//        
+//        System.out.println(construciones.size() + " - " + obsPigs + " - " + freePig);
+//        
+//        return result;
+//    }
 	
 /**
  * 
@@ -1169,4 +1192,29 @@ public boolean tieneNBloquesAlineados ( int N){
 	}
 	return result;
 }
+
+
+public boolean isBlockinBuilding(ABObject block){
+	
+	return this.blocks.contains(block);
+	
+}
+
+
+@Override
+public Shot GetBestShot(SceneState Scene) {
+	// TODO Auto-generated method stub
+	System.out.println("Usando el metodo desde la clase Building.");
+	return null;
+}
+
+
+@Override
+public int GetTapTime(ABType Bird) {
+	// TODO Auto-generated method stub
+	System.out.println("Usando el metodo desde la clase Building.");
+	return -1;
+}
+
+
 }

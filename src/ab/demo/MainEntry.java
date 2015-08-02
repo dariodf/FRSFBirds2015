@@ -25,7 +25,7 @@ public class MainEntry {
 	    DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL,
 	        DateFormat.MEDIUM);
 
-	    tori.utils.Logger.Print(df.format(cal.getTime()));
+	    //tori.utils.Logger.Print(df.format(cal.getTime()));
 	    System.out.println(df.format(cal.getTime()));
 		
 		String command = "";

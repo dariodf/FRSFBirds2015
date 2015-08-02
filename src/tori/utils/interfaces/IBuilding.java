@@ -1,8 +1,12 @@
 package tori.utils.interfaces;
 
-import java.awt.Point;
+import ab.demo.other.Shot;
+import ab.vision.ABType;
+import tori.heuristics.SceneState;
 
-interface IBuilding {
+public interface IBuilding {
 
-	public Point GetBestPoint();
+	public Shot GetBestShot(SceneState Scene);
+	
+	public int GetTapTime(ABType Bird);
 }

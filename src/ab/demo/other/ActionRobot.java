@@ -132,9 +132,9 @@ public class ActionRobot {
 		ss.shoot(proxy, csc);
 		System.out.println("Shooting Completed");
 		System.out
-				.println("wait 15 seconds to ensure all objects in the scene static");
+				.println("wait 5 seconds to ensure all objects in the scene static");
 		try {
-			Thread.sleep(15000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -253,24 +253,6 @@ public class ActionRobot {
 		});
 		return _birds.get(0).getType();
 	}
-
-	public List<ABObject> getListOfBirds()
-	{
-		BufferedImage screenshot = doScreenShot();
-		Vision vision = new Vision(screenshot);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			
-			e.printStackTrace();
-		}
-		fullyZoomOut();
-		List<ABObject> _birds = vision.findBirdsMBR();
-		return _birds;
-	}	
-
-
-
 
 	public static void main(String args[]) {
 

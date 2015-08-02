@@ -6,7 +6,14 @@ import java.io.IOException;
 
 public final class Logger {
 	public static String LogPath = "Output";
+	public static String ScoreFile = "";
 	public static void Print(String Message) {
+		
+		Print(Message, "Log.txt");
+	 
+		
+	}
+public static void Print(String Message, String fileName) {
 		
 		try {
 			File f = new File(LogPath);
@@ -14,7 +21,7 @@ public final class Logger {
 				f.mkdir();
 			}
 			
-			FileWriter fw = new FileWriter(LogPath + "/Log.txt", true);
+			FileWriter fw = new FileWriter(LogPath + "/" + fileName, true);
 			fw.write(System.getProperty( "line.separator" ));
 			
 			fw.write(Message);

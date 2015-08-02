@@ -508,17 +508,6 @@ public class ABObject extends Rectangle
 		else 
 			return sorted.get(0);
     } 
-
-         /**
-    *	finds the object that is furthest from this object above
-    */     
-    public ABObject findFurthestAboveTWO(List <ABObject> objs)
-    {
-    	ABObject above = this;
-    	while (above.findNearestAbove(objs) != null)
-    		above = findNearestAbove(objs);
-    	return above;
-    }
      /**
     *	finds the object that is furthest from this object above
     */     

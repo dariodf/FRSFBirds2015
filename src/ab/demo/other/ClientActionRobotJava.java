@@ -53,13 +53,6 @@ public class ClientActionRobotJava extends ClientActionRobot {
 				intToByteArray(t2), polar);
 	}
 
-	public byte[] shootFast(int fx, int fy, int dx, int dy, int t1, int t2,
-			boolean polar) {
-		return super.shootFast(intToByteArray(fx), intToByteArray(fy),
-				intToByteArray(dx), intToByteArray(dy), intToByteArray(t1),
-				intToByteArray(t2), polar);
-	}
-
 	//send a shot sequence message using int arrays as input
 	//one array per shot
 	public byte[] cshootSequence(int[]... shots) {
@@ -99,21 +92,6 @@ public class ClientActionRobotJava extends ClientActionRobot {
 		});
 		return _birds.get(0).getType();
 	}
-
-	public List<ABObject> getListOfBirds()
-	{
-		BufferedImage screenshot = doScreenShot();
-		Vision vision = new Vision(screenshot);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			
-			e.printStackTrace();
-		}
-		List<ABObject> _birds = vision.findBirdsMBR();
-		return _birds;
-	}
-
 	public int[] checkMyScore() {
 		byte[] scores = super.getMyScore();
 		int[] _scores = new int[scores.length/4];

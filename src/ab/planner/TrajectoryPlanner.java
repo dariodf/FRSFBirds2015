@@ -114,7 +114,7 @@ public class TrajectoryPlanner {
 
 		// adjust the scale and angle change
 		adjustScale(Math.sqrt(ux*ux + uy*uy), theta);
-		tori.utils.Logger.Print("\nscale factor changed to: " + _scaleFactor);
+		//tori.utils.Logger.Print("\nscale factor changed to: " + _scaleFactor);
 		System.out.println("\nscale factor changed to: " + _scaleFactor);
 		_trajSet = false;
 	}
@@ -489,7 +489,8 @@ public class TrajectoryPlanner {
 
 	}
 
-	public boolean trajectoriaObstruida(Rectangle sling, ArrayList<Point> release, Point target, ABObject object){
+//	public boolean trajectoriaObstruida(Rectangle sling, ArrayList<Point> release, Point target, ABObject object){
+	public boolean trajectoriaObstruida(Rectangle sling, Point release, Point target, ABObject object){
 
 		double x1, y1;
 		double x2, y2;
@@ -508,9 +509,10 @@ public class TrajectoryPlanner {
 				TargetEntreX = target.x > object.x && target.x < (object.x + object.width),
 				TargetSobreObjeto = target.y < object.y,
 				targetDebajoObjeto = (target.y > object.y + object.height);
-				if(object.type == ABType.Hill)
-					System.out.println("----------------------------- Hay un HILL en los bloques!!!!!!!!!!!!!!!!!!!!");
-
+				if(object.type == ABType.Hill && object.contains(target)){
+					//System.out.println("----------------------------- Hay un HILL en los bloques!!!!!!!!!!!!!!!!!!!!");
+					return false;
+				}
 				/*
 		if(object.y < target.y)
 			return false;
@@ -529,10 +531,12 @@ public class TrajectoryPlanner {
 				x3 = target.x;
 				y3 = target.y;
 
-				for (Point p : release) {
+				//for (Point p : release) {
 					// Punto de lanzamiento
-					x1 = p.x;
-					y1 = p.y;
+//					x1 = p.x;
+//					y1 = p.y;
+				x1 = release.x;
+				y1 = release.y;
 
 					denom = (x1 - x2) * (x1 - x3) * (x2 - x3);
 					A = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denom;
@@ -570,7 +574,7 @@ public class TrajectoryPlanner {
 					//				(target.x < (object.x+object.width) &&yWidth >= object.y))
 					//				return true;		
 
-				}
+//				}
 
 				return false;
 

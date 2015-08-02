@@ -8,6 +8,8 @@
 *****************************************************************************/
 package ab.demo.other;
 
+import java.awt.Point;
+
 
 
 public class Shot {
@@ -129,6 +131,14 @@ public String toString()
 	
    return  result;
 
+}
+
+public Point getXY(){
+	return new Point(this.x, this.y);
+}
+public void setXY(Point point){
+	this.setX(point.x);
+	this.setY(point.y);
 }
 
 }

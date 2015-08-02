@@ -14,7 +14,7 @@
 		<javac includeantruntime="false" srcdir="src" destdir="src" classpathref="classpath"/>
     </target>
 	<target name="jar">
-        <jar destfile="FRSFBirds2015.jar">
+        <jar destfile="ToriTeamAgent.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="ab.demo.MainEntry"/>
@@ -32,7 +32,7 @@
 	<target name="full">
 		<mkdir dir="src"/>
 		<javac includeantruntime="false" srcdir="src" destdir="src" classpathref="classpath"/>
-		<jar destfile="FRSFBirds2015.jar">
+		<jar destfile="ToriTeamAgent.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="ab.demo.MainEntry"/>

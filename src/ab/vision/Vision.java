@@ -98,6 +98,17 @@ public class Vision {
 		}
 		return visionMBR.findSlingshotMBR();
 	}
+	
+	public Rectangle findSlingshotRealShape()
+	{
+		if (visionRealShape == null)
+		{
+			visionRealShape = new VisionRealShape(image);
+		}
+		
+		return visionRealShape.findSling();
+	}
+	
 	public List<Point> findTrajPoints()
 	{
 		if (visionMBR == null)
